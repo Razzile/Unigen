@@ -106,11 +106,11 @@ uint64_t FileStream::PeekULong() {
 }
 
 void FileStream::PeekBuf(void* buf, size_t size) {
-	size_t offset = Offset();
+	size_t offset = this->offset();
 	if (stream_.is_open()) {
 		stream_.read(reinterpret_cast<char*>(buf), size);
 	}
-	SetOffset(offset);
+	set_offset(offset);
 }
 
 void FileStream::WriteChar(int8_t c) {
@@ -152,10 +152,10 @@ void FileStream::WriteBuf(void* buf, size_t size) {
 	}
 }
 
-size_t FileStream::Offset() {
+size_t FileStream::offset() {
 	return stream_.tellp();
 }
 
-void FileStream::SetOffset(size_t offset) {
+void FileStream::set_offset(size_t offset) {
 	stream_.seekp(offset);
 }

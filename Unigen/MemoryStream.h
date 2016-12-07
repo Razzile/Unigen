@@ -39,7 +39,7 @@ public:
 	void WriteULong(uint64_t l) override;
 	void WriteBuf(void *buf, size_t size) override;
 
-	size_t offset() const override;
+	size_t offset() override;
 	void set_offset(size_t offset) override;
 
 	template <typename T> T Read();

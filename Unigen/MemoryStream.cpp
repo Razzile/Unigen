@@ -165,7 +165,7 @@ void MemoryStream::WriteBuf(void* buf, size_t size) {
 	pos_ += size;
 }
 
-size_t MemoryStream::offset() const {
+size_t MemoryStream::offset() {
 	return pos_;
 }
 
