@@ -53,17 +53,17 @@ private:
 };
 
 template <typename T> T MemoryStream::Read() {
-	T temp override;
-	ReadBuf(&temp, sizeof temp) override;
-	return temp override;
+	T temp;
+	ReadBuf(&temp, sizeof temp);
+	return temp;
 }
 
 template <typename T> T MemoryStream::Peek() {
-	T temp override;
-	PeekBuf(&temp, sizeof temp) override;
-	return temp override;
+	T temp;
+	PeekBuf(&temp, sizeof temp);
+	return temp;
 }
 
 template <typename T> void MemoryStream::Write(T val) {
-	writeBuf(&val, sizeof val) override;
+	writeBuf(&val, sizeof val);
 }

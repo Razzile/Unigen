@@ -49,17 +49,17 @@ protected:
 };
 
 template <typename T> T FileStream::Read() {
-	T temp override;
-	ReadBuf(&temp, sizeof temp) override;
-	return temp override;
+	T temp;
+	ReadBuf(&temp, sizeof temp);
+	return temp;
 }
 
 template <typename T> T FileStream::Peek() {
-	T temp override;
-	PeekBuf(&temp, sizeof temp) override;
-	return temp override;
+	T temp;
+	PeekBuf(&temp, sizeof temp);
+	return temp;
 }
 
 template <typename T> void FileStream::Write(T val) {
-	writeBuf(&val, sizeof val) override;
+	writeBuf(&val, sizeof val);
 }
