@@ -40,26 +40,7 @@ public:
   size_t offset() override;
   void set_offset(size_t offset) override;
 
-  template <typename T> T Read();
-  template <typename T> T Peek();
-  template <typename T> void Write(T val);
-
 protected:
   std::fstream stream_;
 };
 
-template <typename T> T FileStream::Read() {
-  T temp;
-  ReadBuf(&temp, sizeof temp);
-  return temp;
-}
-
-template <typename T> T FileStream::Peek() {
-  T temp;
-  PeekBuf(&temp, sizeof temp);
-  return temp;
-}
-
-template <typename T> void FileStream::Write(T val) {
-  writeBuf(&val, sizeof val);
-}

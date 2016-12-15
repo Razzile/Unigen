@@ -1,7 +1,9 @@
 #include "stdafx.h"
 #include "FileStream.h"
 
-FileStream::FileStream(std::string path) : Stream(path), stream_(path) {}
+FileStream::FileStream(std::string path) : Stream(path) {
+  stream_.open(path, std::ios::in | std::ios::out | std::ios::binary);
+}
 
 int8_t FileStream::ReadChar() {
   int8_t c;
@@ -108,7 +110,7 @@ uint64_t FileStream::PeekULong() {
 void FileStream::PeekBuf(void* buf, size_t size) {
   size_t offset = this->offset();
   if (stream_.is_open()) {
-    stream_.read(reinterpret_cast<char*>(buf), size);
+    stream_.read((char *)buf, size);
   }
   set_offset(offset);
 }

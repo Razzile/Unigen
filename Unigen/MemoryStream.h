@@ -42,28 +42,8 @@ public:
   size_t offset() override;
   void set_offset(size_t offset) override;
 
-  template <typename T> T Read();
-  template <typename T> T Peek();
-  template <typename T> void Write(T val);
-
 private:
   char *base_;
   size_t size_;
   size_t pos_;
 };
-
-template <typename T> T MemoryStream::Read() {
-  T temp;
-  ReadBuf(&temp, sizeof temp);
-  return temp;
-}
-
-template <typename T> T MemoryStream::Peek() {
-  T temp;
-  PeekBuf(&temp, sizeof temp);
-  return temp;
-}
-
-template <typename T> void MemoryStream::Write(T val) {
-  writeBuf(&val, sizeof val);
-}

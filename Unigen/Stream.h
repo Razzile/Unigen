@@ -37,6 +37,26 @@ public:
   virtual size_t offset() = 0;
   virtual void set_offset(size_t offset) = 0;
 
+  template <typename T> T Read();
+  template <typename T> T Peek();
+  template <typename T> void Write(T val);
+
 protected:
   std::string path_;
 };
+
+template <typename T> T Stream::Read() {
+  T temp;
+  ReadBuf(&temp, sizeof(T));
+  return temp;
+}
+
+template <typename T> T Stream::Peek() {
+  T temp;
+  PeekBuf(&temp, sizeof(T));
+  return temp;
+}
+
+template <typename T> void Stream::Write(T val) {
+  WriteBuf(&val, sizeof(T));
+}
