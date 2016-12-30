@@ -42,8 +42,17 @@ public:
   size_t offset() override;
   void set_offset(size_t offset) override;
 
+  template <typename T> T *View(size_t offset);
+
 private:
   char *base_;
   size_t size_;
   size_t pos_;
 };
+ 
+template <typename T>
+T *MemoryStream::View(size_t offset) {
+  char *temp = (base_ + offset);
+  return (T*)temp;
+}
+

@@ -14,7 +14,7 @@ MemoryStream::MemoryStream(std::string path) : Stream(path), pos_(0) {
   size_ = GetFileSize(hfile, 0);
   assert(hfile != INVALID_HANDLE_VALUE);
   //
-  HANDLE hmap = CreateFileMapping(hfile, NULL, PAGE_READWRITE | SEC_RESERVE, 0, 0, 0);
+  HANDLE hmap = CreateFileMapping(hfile, NULL, PAGE_READWRITE, 0, 0, 0);
   assert(hmap != NULL);
   //
   base_ = (char *)MapViewOfFile(hmap, FILE_MAP_WRITE | FILE_MAP_READ, 0, 0, 0);

@@ -12,7 +12,7 @@ const char *Il2CppMetadataStringLookup(void *base, int index) {
 }
 
 int main(int argc, char **argv) {
-  Stream *stream = new FileStream(argv[1]);
+  MemoryStream *stream = new MemoryStream(argv[1]);
   MetadataObject obj(stream);
   obj.Parse();
   //MemoryStream *stream = new MemoryStream(argv[1]);
