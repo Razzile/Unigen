@@ -133,6 +133,7 @@ typedef int32_t GenericInstIndex;
 typedef int32_t ImageIndex;
 typedef int32_t AssemblyIndex;
 typedef int32_t GuidIndex;
+typedef uint32_t EncodedMethodIndex;
 
 struct MethodInfo;
 struct Il2CppClass;
@@ -730,6 +731,26 @@ struct Il2CppGlobalMetadataHeader {
   int32_t attributeTypesCount;
 };
 
+struct Il2CppMetadataUsageList {
+  uint32_t start;
+  uint32_t count;
+};
+
+struct Il2CppMetadataUsagePair {
+  uint32_t destinationIndex;
+  uint32_t encodedSourceIndex;
+};
+
+enum Il2CppMetadataUsage {
+  kIl2CppMetadataUsageInvalid,
+  kIl2CppMetadataUsageTypeInfo,
+  kIl2CppMetadataUsageIl2CppType,
+  kIl2CppMetadataUsageMethodDef,
+  kIl2CppMetadataUsageFieldInfo,
+  kIl2CppMetadataUsageStringLiteral,
+  kIl2CppMetadataUsageMethodRef,
+};
+
 struct Il2CppMarshalingFunctions {
   uint32_t marshal_to_native_func;
   uint32_t marshal_from_native_func;
@@ -762,6 +783,7 @@ struct Il2CppMethodSpec {
   GenericInstIndex classIndexIndex;
   GenericInstIndex methodIndexIndex;
 };
+
 
 struct Il2CppMetadataRegistration {
   int32_t genericClassesCount;

@@ -45,7 +45,9 @@ static const char *type_names[] = {
 
 class MetadataObject {
 public:
-  MetadataObject(MemoryStream *stream) : stream_(stream) {};
+  MetadataObject(MemoryStream *metadata, MemoryStream *binary,
+    uintptr_t mReg, uintptr_t cReg) : stream_(metadata), binary_(binary), 
+    mReg_(mReg), cReg_(cReg)  {};
   bool Parse();
 
   inline const Il2CppGlobalMetadataHeader& header() const { return *header_; }
@@ -58,16 +60,24 @@ private:
 
   std::vector<Il2CppClass *> ClassesFromImage(Il2CppImage *img);
   std::vector<MethodInfo *> MethodsFromClass(Il2CppClass *cls);
+  std::vector<MethodInfo *> OrderedMethodList();
+
+  size_t FindMetadataRegistration();
 
   Il2CppClass *ClassFromTypeDefinition(TypeDefinitionIndex index);
   MethodInfo *MethodFromMethodDefinition(MethodIndex index);
   Il2CppType *TypeFromTypeIndex(TypeIndex index);
+  methodPointerType *MethodPointerFromIndex(MethodIndex index);
+  Il2CppGenericContainer *GenericContainerFromIndex(GenericContainerIndex index); // metadata header
 
   template <typename T> T ItemLookup(size_t section, size_t item);
   const char *StringLookup(StringIndex nameIndex);
   const char *TypeNameFromType(const Il2CppType *type);
 
   MemoryStream *stream_;
+  MemoryStream *binary_;
+  uintptr_t mReg_; // g_MetadataRegistration location
+  uintptr_t cReg_; // g_CodeRegistration location
   Il2CppGlobalMetadataHeader *header_;
   // may wrap these in a class
   std::vector<Il2CppImage *> images_;

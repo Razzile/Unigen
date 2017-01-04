@@ -5,39 +5,58 @@
 #include "il2cpp.h"
 #include "FileStream.h"
 #include "MetadataObject.h"
-
-const char *Il2CppMetadataStringLookup(void *base, int index) {
-  Il2CppGlobalMetadataHeader *metadata = (Il2CppGlobalMetadataHeader *)base;
-  return (const char *)metadata + metadata->stringOffset + index;
-}
+#include "getopt.h"
 
 int main(int argc, char **argv) {
-  MemoryStream *stream = new MemoryStream(argv[1]);
-  MetadataObject obj(stream);
+  static struct option long_options[] = {
+    /* These options set a flag. */
+    //{ "verbose", no_argument,       &verbose_flag, 1 },
+    //{ "brief",   no_argument,       &verbose_flag, 0 },
+    /* These options don’t set a flag.
+    We distinguish them by their indices. */
+    { "metadata",required_argument, 0, 'm' },
+    { "binary",  required_argument, 0, 'b' },
+    { "mReg",    optional_argument, 0, 'r' },
+    { "cReg",    optional_argument, 0, 'c' },
+    { "output",  required_argument, 0, 'o' },
+    { 0, 0, 0, 0 }
+  };
+
+  char *metadata_file = 0;
+  char *binary_file = 0;
+  uintptr_t metadata_reg_off = 0;
+  uintptr_t code_reg_off = 0;
+
+  int opt;
+  while (1) {
+    int index = 0;
+    opt = getopt_long(argc, argv, "m:b:r:c:o:", long_options, &index);
+    if (opt == -1) break;
+    switch (opt) {
+      case 'm': {
+        metadata_file = optarg;
+        break;
+      }
+      case 'b': {
+        binary_file = optarg;
+        break;
+      }
+      case 'r': {
+        metadata_reg_off = strtoull(optarg, NULL, 0);
+        break;
+      }
+      case 'c': {
+        code_reg_off = strtoull(optarg, NULL, 0);
+        break;
+      }
+      case 'o': {
+        break;
+      }
+    }
+  }
+  MemoryStream *stream = new MemoryStream(metadata_file);
+  MemoryStream *binary = new MemoryStream(binary_file);
+  MetadataObject obj(stream, binary, metadata_reg_off, code_reg_off);
   obj.Parse();
-  //MemoryStream *stream = new MemoryStream(argv[1]);
-  //Il2CppGlobalMetadataHeader metadata = stream->Read<Il2CppGlobalMetadataHeader>();
-  //assert(metadata.sanity == 0xFAB11BAF && metadata.version == 21);
-
-  //int image_count = metadata.imagesCount / sizeof(Il2CppImageDefinition);
-
-  //char *base = (char *)stream->base();
-
-  //Il2CppImageDefinition *image_def_offset = (Il2CppImageDefinition *)(base + metadata.imagesOffset);
-  //std::vector<Il2CppImageDefinition> image_definitions(image_count);
-  //image_definitions.assign(image_def_offset, image_def_offset + image_count);
-
-  //std::vector<Il2CppImage> images;
-  //for (auto& def : image_definitions) {
-  //  Il2CppImage image;
-  //  image.name = Il2CppMetadataStringLookup(stream->base(), def.nameIndex);
-  //  image.assemblyIndex = def.assemblyIndex;
-  //  image.typeStart = def.typeStart;
-  //  image.typeCount = def.typeCount;
-  //  image.entryPointIndex = def.entryPointIndex;
-  //  image.token = def.token;
-
-  //  printf("image %s: %u\n", image.name, image.typeStart);
-  //}
 }
 

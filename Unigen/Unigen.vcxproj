@@ -137,7 +137,9 @@
     <Text Include="ReadMe.txt" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Endian.h" />
     <ClInclude Include="FileStream.h" />
+    <ClInclude Include="getopt.h" />
     <ClInclude Include="il2cpp.h" />
     <ClInclude Include="MemoryStream.h" />
     <ClInclude Include="MetadataObject.h" />

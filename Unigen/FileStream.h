@@ -37,6 +37,8 @@ public:
   void WriteULong(uint64_t l) override;
   void WriteBuf(void *buf, size_t size) override;
 
+  size_t Find(char pattern[], size_t size) { return -1; } // UNIMPLEMENTED
+
   size_t offset() override;
   void set_offset(size_t offset) override;
 

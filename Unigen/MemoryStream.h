@@ -5,9 +5,11 @@ class MemoryStream : public Stream {
 public:
   MemoryStream(std::string path);
 
-  void *base() const { return base_; }
-  void *pointer() const { return base_ + pos_; }
+  char *base() const { return base_; }
+  char *pointer() const { return base_ + pos_; }
   size_t size() const { return size_; }
+  
+  char *MapPtr(void *ptr) { return base_ + (uintptr_t)ptr; }
 
   int8_t ReadChar() override;
   uint8_t ReadUChar() override;
@@ -38,6 +40,8 @@ public:
   void WriteLong(int64_t l) override;
   void WriteULong(uint64_t l) override;
   void WriteBuf(void *buf, size_t size) override;
+
+  size_t Find(char pattern[], size_t size) override;
 
   size_t offset() override;
   void set_offset(size_t offset) override;

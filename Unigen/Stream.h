@@ -34,6 +34,8 @@ public:
   virtual void WriteULong(uint64_t l) = 0;
   virtual void WriteBuf(void *buf, size_t size) = 0;
 
+  virtual size_t Find(char pattern[], size_t size) = 0;
+
   virtual size_t offset() = 0;
   virtual void set_offset(size_t offset) = 0;
 
