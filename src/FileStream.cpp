@@ -1,4 +1,3 @@
-#include "stdafx.h"
 #include "FileStream.h"
 
 FileStream::FileStream(std::string path) : Stream(path) {

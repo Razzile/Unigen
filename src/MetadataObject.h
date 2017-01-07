@@ -46,7 +46,7 @@ static const char *type_names[] = {
 class MetadataObject {
 public:
   MetadataObject(MemoryStream *metadata, MemoryStream *binary,
-    uintptr_t mReg, uintptr_t cReg) : stream_(metadata), binary_(binary), 
+    uintptr_t mReg, uintptr_t cReg) : stream_(metadata), binary_(binary),
     mReg_(mReg), cReg_(cReg)  {};
   bool Parse();
 

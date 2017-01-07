@@ -1,4 +1,3 @@
-#include "stdafx.h"
 #include "MemoryStream.h"
 #include <assert.h>
 #include <string.h>

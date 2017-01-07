@@ -1,4 +1,3 @@
-#include "stdafx.h"
 #include "MetadataObject.h"
 #include "Endian.h"
 #include <assert.h>
@@ -156,7 +155,7 @@ Il2CppClass *MetadataObject::ClassFromTypeDefinition(TypeDefinitionIndex index) 
   temp->interfaces_count = definition->interfaces_count;
   temp->interface_offsets_count = definition->interface_offsets_count;
   temp->token = definition->token;
- 
+
   return temp;
 }
 
