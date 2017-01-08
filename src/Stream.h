@@ -47,7 +47,7 @@ protected:
   std::string path_;
 };
 
-template <typename T> T Stream::Read() {
+template <typename T> T Stream::Read(size_t off) {
   T temp;
   ReadBuf(&temp, sizeof(T));
   return temp;

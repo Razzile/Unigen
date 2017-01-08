@@ -13,8 +13,8 @@
 #define HELP_PATH "Unigen/src"
 #endif
 
-DEFINE_string(metadata, "global-metadata.dat", "global-metadata file needed by Unigen");
-DEFINE_string(binary, "a.out", "binary file (either mach-o or libil2cpp.so) needed by Unigen");
+DEFINE_string(metadata, "", "global-metadata file needed by Unigen");
+DEFINE_string(binary, "", "binary file (either mach-o or libil2cpp.so) needed by Unigen");
 // below definitions are incompatible with 64 bit
 DEFINE_uint32(metadata_registration, 0x0, "location of g_MetadataRegistration in binary");
 DEFINE_uint32(code_registration, 0x0, "location of g_CodeRegistration in binary");
@@ -28,14 +28,21 @@ int main(int argc, char **argv) {
   gflags::SetUsageMessage("unigen -metadata=\"gloabal_metadata.dat\ -binary=\"libil2cpp.so\"\
                           -metadata_registration=0x12345 -code_registration=0x12345");
   gflags::SetVersionString("0.1.0");
+  
+  // setup custom help output
   if (FLAGS_help) {
     FLAGS_help = false;
     FLAGS_helpmatch = HELP_PATH;
   }
   gflags::HandleCommandLineHelpFlags();
 
-  MemoryStream *stream = new MemoryStream(FLAGS_metadata);
-  MemoryStream *binary = new MemoryStream(FLAGS_binary);
-  MetadataObject obj(stream, binary, FLAGS_metadata_registration, FLAGS_code_registration);
+  if (FLAGS_metadata.empty() || FLAGS_binary.empty()) {
+    printf("no metadata or binary input passed.");
+    return 1;
+  }
+
+  MemoryStream stream(FLAGS_metadata);
+  MemoryStream binary(FLAGS_binary);
+  MetadataObject obj(&stream, &binary, FLAGS_metadata_registration, FLAGS_code_registration);
   obj.Parse();
 }

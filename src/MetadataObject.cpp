@@ -17,7 +17,7 @@ static inline uint32_t GetDecodedMethodIndex(EncodedMethodIndex index) {
 
 bool MetadataObject::Parse() {
   auto &stream = stream_;
-  header_ = stream->View<Il2CppGlobalMetadataHeader>(0x0);
+  header_ = stream->Read<Il2CppGlobalMetadataHeader>();
 
   assert(header_->sanity == 0xFAB11BAF && header_->version == 21);
 
@@ -27,7 +27,7 @@ bool MetadataObject::Parse() {
   for (auto &image : images_) {
     for (auto &cls : ClassesFromImage(image)) {
       for (auto &method : MethodsFromClass(cls)) {
-        const Il2CppType *type = method->return_type;
+        const Il2CppType *type = method.return_type;
         printf("%s %s::%s\n", TypeNameFromType(type), cls->name, method->name);
       }
     }

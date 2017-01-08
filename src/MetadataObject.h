@@ -51,42 +51,34 @@ public:
   bool Parse();
 
   inline const Il2CppGlobalMetadataHeader& header() const { return *header_; }
-  inline std::vector<Il2CppImage *> images() const { return images_; }
+  inline std::vector<Il2CppImage>& images() const { return images_; }
 private:
   inline MemoryStream* stream() const { return stream_; }
 
   bool ParseImages();
   bool ParseClasses();
 
-  std::vector<Il2CppClass *> ClassesFromImage(Il2CppImage *img);
-  std::vector<MethodInfo *> MethodsFromClass(Il2CppClass *cls);
-  std::vector<MethodInfo *> OrderedMethodList();
+  std::vector<Il2CppClass> ClassesFromImage(Il2CppImage img);
+  std::vector<MethodInfo> MethodsFromClass(Il2CppClass cls);
 
-  size_t FindMetadataRegistration();
+  Il2CppClass ClassFromTypeDefinition(TypeDefinitionIndex index);
+  MethodInfo MethodFromMethodDefinition(MethodIndex index);
 
-  Il2CppClass *ClassFromTypeDefinition(TypeDefinitionIndex index);
-  MethodInfo *MethodFromMethodDefinition(MethodIndex index);
-  Il2CppType *TypeFromTypeIndex(TypeIndex index);
+  // TODO: relocate these
+  Il2CppType *TypeFromTypeIndex(TypeIndex index); 
   methodPointerType *MethodPointerFromIndex(MethodIndex index);
+
   Il2CppGenericContainer *GenericContainerFromIndex(GenericContainerIndex index); // metadata header
 
-  template <typename T> T ItemLookup(size_t section, size_t item);
   const char *StringLookup(StringIndex nameIndex);
-  const char *TypeNameFromType(const Il2CppType *type);
+  const char *TypeNameFromType(const Il2CppType *type); // relocate?
 
   MemoryStream *stream_;
   MemoryStream *binary_;
   uintptr_t mReg_; // g_MetadataRegistration location
   uintptr_t cReg_; // g_CodeRegistration location
-  Il2CppGlobalMetadataHeader *header_;
+  Il2CppGlobalMetadataHeader header_;
   // may wrap these in a class
-  std::vector<Il2CppImage *> images_;
-  std::vector<Il2CppClass *> classes_;
+  std::vector<Il2CppImage> images_;
+  std::vector<Il2CppClass> classes_;
 };
-
-
-template <typename T>
-T MetadataObject::ItemLookup(size_t section, size_t item) {
-  stream_->set_offset(section + item);
-  return stream_->Read<T>();
-}
