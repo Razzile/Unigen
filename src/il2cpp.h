@@ -145,7 +145,7 @@ struct Il2CppImage;
 struct FieldInfo;
 struct Il2CppTypeDefinition;
 
-typedef void(*methodPointerType)();
+typedef void(*Il2CppMethodPointer)();
 typedef void*(*InvokerMethod)(const MethodInfo*, void*, void**);
 
 struct Il2CppType;
@@ -229,7 +229,7 @@ struct ParameterInfo {
 };
 
 struct MethodInfo {
-  methodPointerType method;
+  Il2CppMethodPointer method;
   InvokerMethod invoker_method;
   const char* name;
   Il2CppClass *declaring_type;

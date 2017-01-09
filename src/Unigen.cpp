@@ -1,11 +1,9 @@
 // Unigen.cpp : Defines the entry point for the console application.
 //
 
-#include "il2cpp.h"
-#include "FileStream.h"
-#include "MetadataObject.h"
-#include "getopt.h"
 #include <gflags/gflags.h>
+#include <iostream>
+#include "IDCGenerator.h"
 
 #ifdef _WIN32
 #define HELP_PATH "Unigen\\src"
@@ -41,8 +39,11 @@ int main(int argc, char **argv) {
     return 1;
   }
 
-  MemoryStream stream(FLAGS_metadata);
-  MemoryStream binary(FLAGS_binary);
-  MetadataObject obj(&stream, &binary, FLAGS_metadata_registration, FLAGS_code_registration);
-  obj.Parse();
+  MemoryStream metadata_stream(FLAGS_metadata);
+  MemoryStream bin_stream(FLAGS_binary);
+  MetadataObject metadata(&metadata_stream);
+  Binary bin(&bin_stream, FLAGS_metadata_registration, FLAGS_code_registration);
+
+  IDCGenerator gen(&metadata, &bin);
+  std::cout << gen.Run();
 }
