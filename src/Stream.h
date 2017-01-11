@@ -39,9 +39,9 @@ public:
   virtual size_t offset() = 0;
   virtual void set_offset(size_t offset) = 0;
 
-  template <typename T> T Read(size_t off = offset());
-  template <typename T> T Peek(size_t off = offset());
-  template <typename T> void Write(T val, size_t off = offset());
+  template <typename T> T Read(size_t off = 0);
+  template <typename T> T Peek(size_t off = 0);
+  template <typename T> void Write(T val, size_t off = 0);
 
 protected:
   std::string path_;

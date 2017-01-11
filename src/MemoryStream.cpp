@@ -5,10 +5,13 @@
 #ifdef _WIN32
 #include <Windows.h>
 #else
+#include <fcntl.h>
 #include <sys/mman.h>
+#include <sys/stat.h>
 #endif
 
-inline static void *_memmem(const void *l, size_t l_len, const void *s, size_t s_len) {
+inline static void *_memmem(const void *l, size_t l_len, const void *s,
+                            size_t s_len) {
   register char *cur, *last;
   const char *cl = (const char *)l;
   const char *cs = (const char *)s;
@@ -35,9 +38,12 @@ inline static void *_memmem(const void *l, size_t l_len, const void *s, size_t s
   return NULL;
 }
 
+// TODO: store handles in object for use in destructior
 MemoryStream::MemoryStream(std::string path) : Stream(path), pos_(0) {
 #ifdef _WIN32
-  HANDLE hfile = CreateFileA(path_.data(), GENERIC_READ | GENERIC_WRITE, 0, NULL, OPEN_EXISTING, FILE_FLAG_RANDOM_ACCESS, NULL);
+  HANDLE hfile =
+      CreateFileA(path_.data(), GENERIC_READ | GENERIC_WRITE, 0, NULL,
+                  OPEN_EXISTING, FILE_FLAG_RANDOM_ACCESS, NULL);
   size_ = GetFileSize(hfile, 0);
   assert(hfile != INVALID_HANDLE_VALUE);
   //
@@ -46,7 +52,13 @@ MemoryStream::MemoryStream(std::string path) : Stream(path), pos_(0) {
   //
   base_ = (char *)MapViewOfFile(hmap, FILE_MAP_WRITE | FILE_MAP_READ, 0, 0, 0);
 #else
+  struct stat sb;
+  int fd = open(path.data(), O_RDWR);
+  fstat(fd, &sb);
+  size_ = sb.st_size;
 
+  base_ =
+      (char *)mmap(NULL, sb.st_size, PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0);
 #endif
 }
 
@@ -98,7 +110,7 @@ uint64_t MemoryStream::ReadULong() {
   return l;
 }
 
-void MemoryStream::ReadBuf(void* buf, size_t size) {
+void MemoryStream::ReadBuf(void *buf, size_t size) {
   memcpy(buf, base_ + pos_, size);
   pos_ += size;
 }
@@ -151,58 +163,40 @@ uint64_t MemoryStream::PeekULong() {
   return l;
 }
 
-void MemoryStream::PeekBuf(void* buf, size_t size) {
+void MemoryStream::PeekBuf(void *buf, size_t size) {
   memcpy(buf, base_ + pos_, size);
 }
 
-void MemoryStream::WriteChar(int8_t c) {
-  WriteBuf(&c, sizeof(c));
-}
+void MemoryStream::WriteChar(int8_t c) { WriteBuf(&c, sizeof(c)); }
 
-void MemoryStream::WriteUChar(uint8_t c) {
-  WriteBuf(&c, sizeof(c));
-}
+void MemoryStream::WriteUChar(uint8_t c) { WriteBuf(&c, sizeof(c)); }
 
-void MemoryStream::WriteShort(int16_t s) {
-  WriteBuf(&s, sizeof(s));
-}
+void MemoryStream::WriteShort(int16_t s) { WriteBuf(&s, sizeof(s)); }
 
-void MemoryStream::WriteUShort(uint16_t s) {
-  WriteBuf(&s, sizeof(s));
-}
+void MemoryStream::WriteUShort(uint16_t s) { WriteBuf(&s, sizeof(s)); }
 
-void MemoryStream::WriteInt(int32_t i) {
-  WriteBuf(&i, sizeof(i));
-}
+void MemoryStream::WriteInt(int32_t i) { WriteBuf(&i, sizeof(i)); }
 
-void MemoryStream::WriteUInt(uint32_t i) {
-  WriteBuf(&i, sizeof(i));
-}
+void MemoryStream::WriteUInt(uint32_t i) { WriteBuf(&i, sizeof(i)); }
 
-void MemoryStream::WriteLong(int64_t l) {
-  WriteBuf(&l, sizeof(l));
-}
+void MemoryStream::WriteLong(int64_t l) { WriteBuf(&l, sizeof(l)); }
 
-void MemoryStream::WriteULong(uint64_t l) {
-  WriteBuf(&l, sizeof(l));
-}
+void MemoryStream::WriteULong(uint64_t l) { WriteBuf(&l, sizeof(l)); }
 
-void MemoryStream::WriteBuf(void* buf, size_t size) {
+void MemoryStream::WriteBuf(void *buf, size_t size) {
   memcpy(base_ + pos_, buf, size);
   pos_ += size;
 }
 
 size_t MemoryStream::Find(char pattern[], size_t size) {
-  if (pos_ + size > size_) return -1;
+  if (pos_ + size > size_)
+    return -1;
   char *pos = (char *)_memmem(base_ + pos_, size_ - pos_, pattern, size);
-  if (pos) return pos - base_;
+  if (pos)
+    return pos - base_;
   return -1;
 }
 
-size_t MemoryStream::offset() {
-  return pos_;
-}
+size_t MemoryStream::offset() { return pos_; }
 
-void MemoryStream::set_offset(size_t offset) {
-  pos_ = offset;
-}
+void MemoryStream::set_offset(size_t offset) { pos_ = offset; }

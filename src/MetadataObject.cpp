@@ -1,7 +1,7 @@
-#include "MetadataObject.h"
 #include "Endian.h"
-#include <assert.h>
+#include "MetadataObject.h"
 #include <algorithm>
+#include <assert.h>
 
 bool MetadataObject::Parse() {
   auto &stream = stream_;
@@ -20,7 +20,8 @@ bool MetadataObject::ParseImages() {
 
   int image_data_size = header.imagesCount;
   int image_count = (image_data_size / sizeof(Il2CppImageDefinition));
-  Il2CppImageDefinition *image_data = stream_->View<Il2CppImageDefinition>(header.imagesOffset);
+  Il2CppImageDefinition *image_data =
+      stream_->View<Il2CppImageDefinition>(header.imagesOffset);
   for (int i = 0; i < image_count; i++) {
     Il2CppImageDefinition *def = &image_data[i];
     Il2CppImage image;
@@ -38,7 +39,8 @@ bool MetadataObject::ParseImages() {
 
 // redundant. now part of ParseImages()
 bool MetadataObject::ParseClasses() {
-  for (int i = 0; i < header_.typeDefinitionsCount / sizeof(Il2CppTypeDefinition); i++) {
+  for (int i = 0;
+       i < header_.typeDefinitionsCount / sizeof(Il2CppTypeDefinition); i++) {
     Il2CppClass class_obj = ClassFromTypeDefinition(i);
     classes_.push_back(class_obj);
   }
@@ -54,62 +56,14 @@ std::vector<Il2CppClass> MetadataObject::ClassesFromImage(Il2CppImage &img) {
   return classes;
 }
 
-// for string literals
-//std::vector<MethodInfo *> MetadataObject::OrderedMethodList() {
-//  auto &stream = stream_;
-//  auto *usage_list = stream->View<Il2CppMetadataUsageList>(header_->metadataUsageListsOffset);
-//
-//  uint32_t start = usage_list->start;
-//  uint32_t count = usage_list->count;
-//
-//  for (int i = 0; i < count; i++) {
-//    auto *pair = stream->View<Il2CppMetadataUsagePair>(header_->metadataUsagePairsOffset + start + i);
-//    Il2CppMetadataUsage usage = GetEncodedIndexType(pair->encodedSourceIndex);
-//    uint32_t decoded_index = GetDecodedMethodIndex(pair->encodedSourceIndex);
-//
-//    switch (usage) {
-//    default: continue;
-//      case k
-//    }
-//  }
-//
-//  return std::vector<MethodInfo *>();
-//}
-
-//size_t MetadataObject::FindMetadataRegistration() {
-//  le<uint32_t> count = 0;
-//  std::vector<MethodInfo*> methods;
-//  for (Il2CppImage *img : images_) {
-//    //printf("image %s\n", img->name);
-//    count += img->typeCount;
-//    for (Il2CppClass *cls : ClassesFromImage(img)) {
-//      //printf("\tclass %s\n", cls->name);
-//      for (MethodInfo *method : MethodsFromClass(cls)) {
-//        methods.push_back(method);
-//      }
-//    }
-//  }
-//
-//  uint32_t real_count = count;
-//
-//  binary_->set_offset(0x0);
-//  while (size_t pos = binary_->Find((char *)&real_count, sizeof(real_count))) {
-//    if (pos == -1) break;
-//    if (*binary_->View<uint32_t>(pos + 8) == real_count) {
-//      return pos - 40;
-//      break;
-//    }
-//    binary_->set_offset(pos + 1);
-//  }
-//  return -1;
-//}
-
 Il2CppClass MetadataObject::ClassFromTypeDefinition(TypeDefinitionIndex index) {
   Il2CppClass temp;
 
-  size_t td_offset = header_.typeDefinitionsOffset + (index * sizeof(Il2CppTypeDefinition));
+  size_t td_offset =
+      header_.typeDefinitionsOffset + (index * sizeof(Il2CppTypeDefinition));
 
-  Il2CppTypeDefinition *definition = stream_->View<Il2CppTypeDefinition>(td_offset);
+  Il2CppTypeDefinition *definition =
+      stream_->View<Il2CppTypeDefinition>(td_offset);
 
   temp.name = StringLookup(definition->nameIndex);
   temp.namespaze = StringLookup(definition->namespaceIndex);
@@ -118,7 +72,8 @@ Il2CppClass MetadataObject::ClassFromTypeDefinition(TypeDefinitionIndex index) {
   temp.genericContainerIndex = definition->genericContainerIndex;
   temp.thread_static_fields_offset = -1;
   temp.flags = definition->flags;
-  temp.is_generic = (definition->genericContainerIndex != -1); // -1 may be wrong
+  temp.is_generic =
+      (definition->genericContainerIndex != -1); // -1 may be wrong
   temp.method_count = definition->method_count;
   temp.property_count = definition->property_count;
   temp.field_count = definition->field_count;
@@ -132,7 +87,7 @@ Il2CppClass MetadataObject::ClassFromTypeDefinition(TypeDefinitionIndex index) {
   return temp;
 }
 
-//Il2CppType *MetadataObject::TypeFromTypeIndex(TypeIndex index) {
+// Il2CppType *MetadataObject::TypeFromTypeIndex(TypeIndex index) {
 //  auto *metadata_reg = binary_->View<Il2CppMetadataRegistration>(mReg_);
 //  Il2CppType **types = (Il2CppType **)binary_->MapPtr(metadata_reg->types);
 //  Il2CppType *type = (Il2CppType *)binary_->MapPtr(types[index]);
@@ -140,9 +95,11 @@ Il2CppClass MetadataObject::ClassFromTypeDefinition(TypeDefinitionIndex index) {
 //  return type;
 //}
 //
-//methodPointerType *MetadataObject::MethodPointerFromIndex(MethodIndex index) {
+// methodPointerType *MetadataObject::MethodPointerFromIndex(MethodIndex index)
+// {
 //  auto *code_reg = binary_->View<Il2CppCodeRegistration>(cReg_);
-//  methodPointerType *type = (methodPointerType *)code_reg->methodPointers[index];
+//  methodPointerType *type = (methodPointerType
+//  *)code_reg->methodPointers[index];
 //  return type;
 //}
 
@@ -163,7 +120,8 @@ MethodInfo MetadataObject::MethodFromMethodDefinition(MethodIndex index) {
   MethodInfo temp;
 
   // will leak
-  Il2CppMethodDefinition *definition = stream_->View<Il2CppMethodDefinition>(header_.methodsOffset + (index * sizeof(Il2CppMethodDefinition)));
+  Il2CppMethodDefinition *definition = stream_->View<Il2CppMethodDefinition>(
+      header_.methodsOffset + (index * sizeof(Il2CppMethodDefinition)));
 
   // TODO: copy more properties
   temp.name = StringLookup(definition->nameIndex);
@@ -175,6 +133,22 @@ MethodInfo MetadataObject::MethodFromMethodDefinition(MethodIndex index) {
   temp.parameters_count = definition->parameterCount;
   temp.token = definition->token;
   temp.methodDefinition = definition;
+  temp.method = binary_->MethodPointerFromIndex(definition->methodIndex);
+  temp.return_type = binary_->TypeFromTypeIndex(definition->returnType);
+
+  ParameterInfo *parameters =
+      new ParameterInfo[definition->parameterCount];
+  for (int i = 0; i < definition->parameterCount; i++) {
+    uint32_t offset =
+        header_.parametersOffset + (i * sizeof(Il2CppParameterDefinition));
+    auto *param_def = stream_->View<Il2CppParameterDefinition>(offset);
+    ParameterInfo &info = parameters[i];
+
+    info.name = StringLookup(param_def->nameIndex);
+    info.token = param_def->token;
+    info.parameter_type = binary_->TypeFromTypeIndex(param_def->typeIndex);
+  }
+  temp.parameters = parameters;
 
   return temp;
 }
@@ -187,7 +161,8 @@ const char *MetadataObject::StringLookup(StringIndex nameIndex) {
   while (true) {
     char c = stream_->ReadChar();
     chars.push_back(c);
-    if (c == '\0') break;
+    if (c == '\0')
+      break;
   }
 
   char *string = new char[chars.size()];
@@ -205,8 +180,6 @@ const char *MetadataObject::TypeNameFromType(const Il2CppType *type) {
   case IL2CPP_TYPE_END: {
     return nullptr;
   }
-  default: {
-    return type_names[type->type];
-  }
+  default: { return type_names[type->type]; }
   }
 }
