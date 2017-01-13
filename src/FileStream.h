@@ -1,6 +1,6 @@
 #pragma once
-#include <fstream>
 #include "Stream.h"
+#include <fstream>
 
 // TODO change offset to long
 class FileStream : public Stream {
@@ -37,7 +37,9 @@ public:
   void WriteULong(uint64_t l) override;
   void WriteBuf(void *buf, size_t size) override;
 
-  size_t Find(char pattern[], size_t size) { return -1; } // UNIMPLEMENTED
+  size_t Find(char pattern[], size_t size) override {
+    return -1;
+  } // UNIMPLEMENTED
 
   size_t offset() override;
   void set_offset(size_t offset) override;
@@ -45,4 +47,3 @@ public:
 protected:
   std::fstream stream_;
 };
-
