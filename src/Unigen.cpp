@@ -11,9 +11,13 @@
 #define HELP_PATH "Unigen/src"
 #endif
 
+DEFINE_bool(typed, false, "output type information");
+
 DEFINE_string(metadata, "", "global-metadata file needed by Unigen");
 DEFINE_string(binary, "",
               "binary file (either mach-o or libil2cpp.so) needed by Unigen");
+DEFINE_string(output, "generated.idc", "output idc file");
+
 // below definitions are incompatible with 64 bit
 DEFINE_uint32(metadata_registration, 0x0,
               "location of g_MetadataRegistration in binary");
@@ -27,7 +31,7 @@ int main(int argc, char **argv) {
   // customize --help output
   gflags::ParseCommandLineNonHelpFlags(&argc, &argv, true);
   gflags::SetUsageMessage(
-      "unigen -metadata=\"gloabal_metadata.dat\ -binary=\"libil2cpp.so\"\
+      "unigen -metadata=\"gloabal_metadata.dat\" -binary=\"libil2cpp.so\"\
                           -metadata_registration=0x12345 -code_registration=0x12345");
   gflags::SetVersionString("0.1.0");
 
@@ -48,6 +52,6 @@ int main(int argc, char **argv) {
   Binary bin(&bin_stream, FLAGS_metadata_registration, FLAGS_code_registration);
   MetadataObject metadata(&metadata_stream, &bin);
 
-  IDCGenerator gen(&metadata);
-  std::cout << gen.Run();
+  IDCGenerator gen(&metadata, FLAGS_output);
+  gen.Run(FLAGS_typed);
 }

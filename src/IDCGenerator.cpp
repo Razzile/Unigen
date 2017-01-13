@@ -1,4 +1,5 @@
 #include "IDCGenerator.h"
+#include <fstream>
 #include <memory>
 #include <stdarg.h>
 #include <stdlib.h>
@@ -44,38 +45,60 @@ std::string string_format(const std::string fmt_str, ...) {
   return std::string(formatted.get());
 }
 
-std::string IDCGenerator::Run() {
+void IDCGenerator::Run(bool typed) {
   auto binary = metadata_->binary();
   std::string output = "#include <idc.idc>\nstatic main() {\n";
 
   metadata_->Parse();
   binary->Parse();
 
+  // loop over every image, then loop over every class in image
+  // finally loop over every method in class, creating an idc stub for each
+  // TODO: this code is messy
   std::vector<Il2CppImage> images = metadata_->images();
   for (Il2CppImage &image : images) {
     for (Il2CppClass &cls : metadata_->ClassesFromImage(image)) {
       for (MethodInfo &info : metadata_->MethodsFromClass(cls)) {
         uintptr_t pointer = (uintptr_t)info.method & ~1;
-        output +=
-            string_format("MakeNameEx(0x%x, \"%s%c%c%s\", SN_NOWARN);\n",
-                          pointer, cls.name, seperator_, seperator_, info.name);
+        output += MakeFunctionString(pointer, cls.name, info.name);
 
-        output += string_format("SetType(0x%x, \"%s %s%c%c%s(", pointer,
-                                TypeNameFromType(info.return_type), cls.name,
-                                seperator_, seperator_, info.name);
-        for (int i = 0; i < info.parameters_count; i++) {
-          const ParameterInfo *param = &info.parameters[i];
-          output += string_format(
-              "%s %s", TypeNameFromType(param->parameter_type), param->name);
-          if (i + 1 != info.parameters_count)
-            output += ", ";
+        // output typ info for IDC too (needs major work)
+        if (typed) {
+          output +=
+              MakeTypeString(pointer, info.return_type, cls.name, info.name,
+                             info.parameters, info.parameters_count);
         }
-        output += ");\");\n";
       }
     }
   }
   output += "}";
-  return output;
+  std::ofstream stream(output_);
+  stream << output;
+  stream.close();
+}
+
+std::string IDCGenerator::MakeFunctionString(uint32_t addr, const char *cls,
+                                             const char *method) {
+  return string_format("MakeNameEx(0x%x, \"%s%c%c%s\", SN_NOWARN);\n", addr,
+                       cls, seperator_, seperator_, method);
+}
+
+std::string IDCGenerator::MakeTypeString(uint32_t addr, const Il2CppType *rtn,
+                                         const char *cls, const char *method,
+                                         const ParameterInfo *params,
+                                         int param_count) {
+  std::string full =
+      string_format("SetType(0x%x, \"%s %s%c%c%s(", addr, TypeNameFromType(rtn),
+                    cls, seperator_, seperator_, method);
+  for (int i = 0; i < param_count; i++) {
+    const ParameterInfo *param = &params[i];
+    full += string_format("%s %s", TypeNameFromType(param->parameter_type),
+                          param->name);
+    if (i + 1 != param_count)
+      full += ", ";
+  }
+  full += ");\");\n";
+  return full;
 }
 
 const char *IDCGenerator::TypeNameFromType(const Il2CppType *type) {
