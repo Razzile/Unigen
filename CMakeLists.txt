@@ -6,7 +6,6 @@ if (NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
   message(STATUS "No build type selected, default to Debug")
   set(CMAKE_BUILD_TYPE "Debug")
 endif()
-
 add_subdirectory(third_party/gflags)
 
 include_directories("${CMAKE_SOURCE_DIR}/src")
