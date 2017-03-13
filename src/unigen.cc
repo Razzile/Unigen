@@ -1,5 +1,3 @@
-// Unigen.cpp : Defines the entry point for the console application.
-//
 /**
  ******************************************************************************
  * Unigen :  Unity metadata parser for il2cpp games                           *
@@ -9,7 +7,6 @@
  ******************************************************************************
  */
 
-#include "IDCGenerator.h"
 #include <gflags/gflags.h>
 #include <iostream>
 
@@ -54,12 +51,4 @@ int main(int argc, char **argv) {
     printf("no metadata or binary input passed.");
     return 1;
   }
-
-  MemoryStream metadata_stream(FLAGS_metadata);
-  MemoryStream bin_stream(FLAGS_binary);
-  Binary bin(&bin_stream, FLAGS_metadata_registration, FLAGS_code_registration);
-  MetadataObject metadata(&metadata_stream, &bin);
-
-  IDCGenerator gen(&metadata, FLAGS_output);
-  gen.Run(FLAGS_typed);
 }
