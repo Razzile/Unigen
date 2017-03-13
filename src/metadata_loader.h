@@ -1,13 +1,27 @@
+/**
+ ******************************************************************************
+ * Unigen :  Unity metadata parser for il2cpp games                           *
+ * File   :  metadata_loader.h                                                *
+ ******************************************************************************
+ * Copyright 2017 Satori. All rights reserved.                                *
+ ******************************************************************************
+ */
 #pragma once
 
-#include <map>
-#include "idc_generator.h"
+#include "memory_stream.h"
 
-class 
+namespace base {
 
 class MetadataLoader {
 public:
+  MetadataLoader(MemoryStream *metadata, MemoryStream *binary)
+    : metadata_(metadata), binary_(binary) {}
 
+  bool GenerateIDC(std::string outPath);
+  bool GenerateHeaders(std::string outPath);
 private:
-    std::map<uint32_t, IDCGenerator> generators_;
+  uint32_t GetMetadataVersion();
+  MemoryStream *metadata_, *binary_;
 };
+
+}
