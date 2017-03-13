@@ -1,3 +1,11 @@
+/**
+ ******************************************************************************
+ * Unigen :  Unity metadata parser for il2cpp games                           *
+ * File   :  memory_stream.cc                                                 *
+ ******************************************************************************
+ * Copyright 2017 Satori. All rights reserved.                                *
+ ******************************************************************************
+ */
 #pragma once
 #include "Stream.h"
 
@@ -8,7 +16,7 @@ public:
   char *base() const { return base_; }
   char *pointer() const { return base_ + pos_; }
   size_t size() const { return size_; }
-  
+
   char *MapPtr(void *ptr) { return base_ + (uintptr_t)ptr; }
 
   int8_t ReadChar() override;
@@ -53,10 +61,9 @@ private:
   size_t size_;
   size_t pos_;
 };
- 
+
 template <typename T>
 T *MemoryStream::View(size_t offset) {
   char *temp = (base_ + offset);
   return (T*)temp;
 }
-

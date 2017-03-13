@@ -1,3 +1,11 @@
+/**
+ ******************************************************************************
+ * Unigen :  Unity metadata parser for il2cpp games                           *
+ * File   :  binary.h                                                         *
+ ******************************************************************************
+ * Copyright 2017 Satori. All rights reserved.                                *
+ ******************************************************************************
+ */
 #pragma once
 #include "memory_stream.h"
 
@@ -14,7 +22,7 @@ class Binary {
 public:
     Binary(std::string file) : stream_(file), type_(UNKNOWN) {}
     Binary(MemoryStream &stream) : stream_(stream), type_(UNKNOWN) {}
-  
+
     MemoryStream &stream() { return stream_; }
 
     uintptr_t FindMetadataRegistration();

@@ -1,3 +1,11 @@
+/**
+ ******************************************************************************
+ * Unigen :  Unity metadata parser for il2cpp games                           *
+ * File   :  memory_stream.cc                                                 *
+ ******************************************************************************
+ * Copyright 2017 Satori. All rights reserved.                                *
+ ******************************************************************************
+ */
 #include "MemoryStream.h"
 #include <assert.h>
 #include <string.h>

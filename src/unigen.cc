@@ -1,5 +1,13 @@
 // Unigen.cpp : Defines the entry point for the console application.
 //
+/**
+ ******************************************************************************
+ * Unigen :  Unity metadata parser for il2cpp games                           *
+ * File   :  unigen.cc                                                        *
+ ******************************************************************************
+ * Copyright 2017 Satori. All rights reserved.                                *
+ ******************************************************************************
+ */
 
 #include "IDCGenerator.h"
 #include <gflags/gflags.h>
