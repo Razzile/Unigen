@@ -10,7 +10,7 @@ add_subdirectory(third_party/gflags)
 
 include_directories("${CMAKE_SOURCE_DIR}/src")
 file(GLOB_RECURSE unigen_SRC
-   "src/*.cpp"
+   "src/*.cc"
    "src/*.h"
 )
 
