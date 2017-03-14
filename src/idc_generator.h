@@ -10,18 +10,17 @@
 
 #include "utils.h"
 
-class MetadataParser;
 namespace base {
 
 class IDCGenerator {
 public:
-    IDCGenerator(MetadataParser *parser, char seperator) : parser_(parser), seperator_(seperator) {}
-    virtual bool GenerateIDC(std::string out) = 0;
-    // TODO: MakeFunctionString and MakeTypeString that aren't version-linked
-protected:
-    MetadataParser *parser_;
-    char seperator_;
+    IDCGenerator(char seperator)
+      : seperator_(seperator) {}
+    IDCGenerator()
+      : IDCGenerator('$') {}
 
+    virtual bool GenerateIDC(std::string out) = 0;
+protected:
     std::string MakeFunctionString(uintptr_t addr, const char *cls, const char *method) {
         return string_format("MakeNameEx(0x%x, \"%s%c%c%s\", SN_NOWARN);\n", addr,
             cls, seperator_, seperator_, method);
@@ -38,6 +37,7 @@ protected:
         full += ");\");\n";
         return full;
     }
+    char seperator_;
 };
 
 }
