@@ -2,6 +2,7 @@
 #include <string>
 #include <memory>
 #include <stdarg.h>
+#include <stdlib.h>
 
 static std::string string_format(const std::string fmt_str, ...) {
     int final_n,

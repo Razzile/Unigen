@@ -6,7 +6,7 @@
  * Copyright 2017 Satori. All rights reserved.                                *
  ******************************************************************************
  */
-#include "MemoryStream.h"
+#include "memory_stream.h"
 #include <assert.h>
 #include <string.h>
 
