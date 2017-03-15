@@ -22,7 +22,7 @@ public:
     virtual bool GenerateIDC(std::string out) = 0;
 protected:
     std::string MakeFunctionString(uintptr_t addr, const char *cls, const char *method) {
-        return string_format("MakeNameEx(0x%x, \"%s%c%c%s\", SN_NOWARN);\n", addr,
+        return string_format("MakeNameEx(0x%llx, \"%s%c%c%s\", SN_NOWARN);\n", addr,
             cls, seperator_, seperator_, method);
     }
 

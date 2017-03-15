@@ -17,7 +17,7 @@ public:
   char *pointer() const { return base_ + pos_; }
   size_t size() const { return size_; }
 
-  char *MapPtr(void *ptr) { return base_ + (uintptr_t)ptr; }
+  char *MapPtr(void *ptr) { return (char *)((uintptr_t)base_ + (uintptr_t)ptr); }
 
   int8_t ReadChar() override;
   uint8_t ReadUChar() override;

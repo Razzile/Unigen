@@ -9,7 +9,7 @@
 #include "idc_generator.h"
 #include <fstream>
 
-bool versions::v20::IDCGenerator::GenerateIDC(std::string out) {
+bool versions::v21::IDCGenerator::GenerateIDC(std::string out) {
  parser_->Load();
  auto images = parser_->Images();
  std::string output = "#include <idc.idc>\nstatic main() {\n";
@@ -32,4 +32,6 @@ bool versions::v20::IDCGenerator::GenerateIDC(std::string out) {
  std::ofstream stream(out);
  stream << output;
  stream.close();
+
+ return true;
 }

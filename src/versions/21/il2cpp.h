@@ -160,7 +160,7 @@ struct Il2CppType;
 
 const int kPublicKeyByteLength = 8;
 
-#pragma pack(push, 4)
+// #pragma pack(push, 4)
 struct Il2CppAssemblyName {
   StringIndex nameIndex;
   StringIndex cultureIndex;
@@ -813,4 +813,4 @@ struct Il2CppMetadataRegistration {
   const size_t metadataUsagesCount;
   void*** metadataUsages;
 };
-#pragma pack(pop)
+// #pragma pack(pop)

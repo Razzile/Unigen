@@ -10,7 +10,7 @@
 #include "metadata_parser.h"
 
 namespace versions {
-namespace v20 {
+namespace v21 {
 
 void MetadataParser::Load() {
   auto &stream = metadata_;
@@ -150,11 +150,14 @@ const char *MetadataParser::StringLookup(StringIndex nameIndex) {
     if (c == '\0')
       break;
   }
+  char *string = new char[chars.size()];
+  std::memcpy(string, &chars[0], chars.size());
+  return string;
 }
 
 Il2CppType *MetadataParser::TypeFromTypeIndex(TypeIndex index) {
   auto *metadata_reg = binary_->View<Il2CppMetadataRegistration>(metadata_registration_);
-  Il2CppType **types = (Il2CppType **)binary_->MapPtr(metadata_reg->types);
+  Il2CppType **types = (Il2CppType **)binary_->MapPtr((void *)((uintptr_t)metadata_reg->types /*- 0x100000000*/));
   Il2CppType *type = (Il2CppType *)binary_->MapPtr(types[index]);
 
   return type;
@@ -162,7 +165,7 @@ Il2CppType *MetadataParser::TypeFromTypeIndex(TypeIndex index) {
 
 Il2CppMethodPointer MetadataParser::MethodPointerFromIndex(MethodIndex index) {
   auto *code_reg = binary_->View<Il2CppCodeRegistration>(code_registration_);
-  Il2CppMethodPointer *types = (Il2CppMethodPointer *)binary_->MapPtr(code_reg->methodPointers);
+  Il2CppMethodPointer *types = (Il2CppMethodPointer *)binary_->MapPtr((void *)((uintptr_t)(code_reg->methodPointers) /*- 0x100000000*/));
 
   Il2CppMethodPointer pointer = (Il2CppMethodPointer)types[index];
   return pointer;

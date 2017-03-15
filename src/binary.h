@@ -25,6 +25,8 @@ public:
 
     MemoryStream &stream() { return stream_; }
 
+    uintptr_t ConvertVirtualAddress(uintptr_t addr);
+
     uintptr_t FindMetadataRegistration();
     uintptr_t FindCodeRegistration();
 protected:

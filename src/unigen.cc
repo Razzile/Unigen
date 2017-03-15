@@ -9,6 +9,7 @@
 
 #include <gflags/gflags.h>
 #include <iostream>
+#include "metadata_loader.h"
 
 #ifdef _WIN32
 #define HELP_PATH "Unigen\\src"
@@ -23,12 +24,17 @@ DEFINE_string(binary, "",
               "binary file (either mach-o or libil2cpp.so) needed by Unigen");
 DEFINE_string(output, "generated.idc", "output idc file");
 
-// below definitions are incompatible with 64 bit
-DEFINE_uint32(metadata_registration, 0x0,
+#if _WIN64 || __x86_64__
+DEFINE_uint64(metadata_registration, 0x0,
               "location of g_MetadataRegistration in binary");
+DEFINE_uint64(code_registration, 0x0,
+    "location of g_CodeRegistration in binary");
+#else
+DEFINE_uint32(metadata_registration, 0x0,
+    "location of g_MetadataRegistration in binary");
 DEFINE_uint32(code_registration, 0x0,
-              "location of g_CodeRegistration in binary");
-
+    "location of g_CodeRegistration in binary");
+#endif
 DECLARE_bool(help);
 DECLARE_string(helpmatch);
 
@@ -51,4 +57,9 @@ int main(int argc, char **argv) {
     printf("no metadata or binary input passed.");
     return 1;
   }
+  MemoryStream metadata(FLAGS_metadata);
+  MemoryStream binary(FLAGS_binary);
+
+  base::MetadataLoader loader(&metadata, &binary);
+  loader.GenerateIDC(FLAGS_output);
 }

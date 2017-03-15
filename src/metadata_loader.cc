@@ -10,18 +10,24 @@
 #include "metadata_loader.h"
 #include <gflags/gflags.h>
 
-#include "versions/20/version.h"
+#include "versions/21/version.h"
 
+#if _WIN64 || __x86_64__
+DECLARE_uint64(metadata_registration);
+DECLARE_uint64(code_registration);
+#else
 DECLARE_uint32(metadata_registration);
 DECLARE_uint32(code_registration);
+#endif
 
 namespace base {
 
 bool MetadataLoader::GenerateIDC(std::string path) {
   uint32_t version = GetMetadataVersion();
+  printf("%d\n", version);
   switch (version) {
-    case 20: {
-      namespace target = versions::v20;
+    case 21: {
+      namespace target = versions::v21;
       auto parser = target::MetadataParser(metadata_, binary_,
         FLAGS_metadata_registration, FLAGS_code_registration);
 
