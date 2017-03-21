@@ -25,10 +25,10 @@ public:
 
     MemoryStream &stream() { return stream_; }
 
-    uintptr_t ConvertVirtualAddress(uintptr_t addr);
+    virtual uintptr_t ConvertVirtualAddress(uintptr_t addr) = 0;
 
-    uintptr_t FindMetadataRegistration();
-    uintptr_t FindCodeRegistration();
+    virtual uintptr_t FindMetadataRegistration() = 0;
+    virtual uintptr_t FindCodeRegistration() = 0;
 protected:
     MemoryStream stream_;
     BinaryType type_;
