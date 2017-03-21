@@ -26,7 +26,8 @@ bool MetadataLoader::GenerateIDC(std::string path) {
   uint32_t version = GetMetadataVersion();
   printf("%d\n", version);
   switch (version) {
-    case 21: {
+    case 21:
+    case 22: {
       namespace target = versions::v21;
       auto parser = target::MetadataParser(metadata_, binary_,
         FLAGS_metadata_registration, FLAGS_code_registration);

@@ -157,7 +157,7 @@ const char *MetadataParser::StringLookup(StringIndex nameIndex) {
 
 Il2CppType *MetadataParser::TypeFromTypeIndex(TypeIndex index) {
   auto *metadata_reg = binary_->View<Il2CppMetadataRegistration>(metadata_registration_);
-  Il2CppType **types = (Il2CppType **)binary_->MapPtr((void *)((uintptr_t)metadata_reg->types /*- 0x100000000*/));
+  Il2CppType **types = (Il2CppType **)binary_->MapPtr((void *)((uintptr_t)metadata_reg->types - 0x100000000));
   Il2CppType *type = (Il2CppType *)binary_->MapPtr(types[index]);
 
   return type;
@@ -165,7 +165,7 @@ Il2CppType *MetadataParser::TypeFromTypeIndex(TypeIndex index) {
 
 Il2CppMethodPointer MetadataParser::MethodPointerFromIndex(MethodIndex index) {
   auto *code_reg = binary_->View<Il2CppCodeRegistration>(code_registration_);
-  Il2CppMethodPointer *types = (Il2CppMethodPointer *)binary_->MapPtr((void *)((uintptr_t)(code_reg->methodPointers) /*- 0x100000000*/));
+  Il2CppMethodPointer *types = (Il2CppMethodPointer *)binary_->MapPtr((void *)((uintptr_t)(code_reg->methodPointers) - 0x100000000));
 
   Il2CppMethodPointer pointer = (Il2CppMethodPointer)types[index];
   return pointer;
