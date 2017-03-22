@@ -166,8 +166,13 @@ struct section_64 { /* for 64-bit architectures */
 namespace macho {
 
 uintptr_t Binary::ConvertVirtualAddress(uintptr_t addr) {
-  struct segment_command *seg = (struct segment_command *)SegmentForAddress(addr);
-  return addr - seg->vmaddr;
+  if (Is64Bit()) {
+    struct segment_command_64 *seg = (struct segment_command_64 *)SegmentForAddress(addr);
+    return addr - seg->vmaddr;
+  } else {
+    struct segment_command *seg = (struct segment_command *)SegmentForAddress(addr);
+    return addr - seg->vmaddr;
+  }
 }
 
 uintptr_t Binary::FindMetadataRegistration() {
@@ -180,7 +185,7 @@ uintptr_t Binary::FindCodeRegistration() {
 
 bool Binary::IsValid() {
   stream_.set_offset(base_);
-  uint32_t magic = stream_.ReadUInt();
+  uint32_t magic = stream_.PeekUInt();
 
   return (magic == MH_MAGIC ||
           magic == MH_CIGAM ||
@@ -190,7 +195,7 @@ bool Binary::IsValid() {
 
 bool Binary::Is64Bit() {
   stream_.set_offset(base_);
-  uint32_t magic = stream_.ReadUInt();
+  uint32_t magic = stream_.PeekUInt();
   return (magic == MH_MAGIC_64 || magic == MH_CIGAM_64);
 }
 
