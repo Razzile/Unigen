@@ -264,3 +264,5 @@ __pycache__/
 *.pyc
 /CMakeSettings.json
 /CMakeSettings.json
+
+third_party/capstone/
