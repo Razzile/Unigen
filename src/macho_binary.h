@@ -10,6 +10,7 @@
 #pragma once
 
 #include "binary.h"
+#include "disassembler.h"
 
 namespace macho {
 
@@ -30,12 +31,16 @@ public:
 private:
   bool IsValid();
   bool Is64Bit();
+  Arch Architecture();
+
+  uintptr_t ConvertToFileAddress(uintptr_t addr);
 
   uintptr_t FindLoadCommand(uint32_t load_command, bool rebase = true);
   uintptr_t FindSegment(std::string segment, bool rebase = true);
   uintptr_t FindSection(std::string section, bool rebase = true);
 
   uintptr_t SegmentForAddress(uintptr_t address, bool rebase = true);
+  uintptr_t SectionForAddress(uintptr_t address, bool rebase = true);
 
   uintptr_t base_;
 };

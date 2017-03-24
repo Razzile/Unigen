@@ -8,12 +8,35 @@
  */
 
 #include "macho_binary.h"
+#include "assembly_crawler_arm.h"
+#include "assembly_crawler_arm64.h"
 
 #define MH_MAGIC 0xFEEDFACE
 #define MH_CIGAM 0xCEFAEDFE
 
 #define MH_MAGIC_64 0xFEEDFACF
 #define MH_CIGAM_64 0xCFFAEDFE
+
+#define CPU_ARCH_MASK  uint32_t(0xff000000)
+#define CPU_ARCH_ABI64 uint32_t(0x01000000)
+
+#define CPU_TYPE_ANY     uint32_t(-1)
+#define CPU_TYPE_VAX     uint32_t( 1)
+#define CPU_TYPE_MC680x0 uint32_t( 6)
+#define CPU_TYPE_X86     uint32_t( 7)
+#define CPU_TYPE_MC98000 uint32_t(10)
+#define CPU_TYPE_HPPA    uint32_t(11)
+#define CPU_TYPE_ARM     uint32_t(12)
+#define CPU_TYPE_MC88000 uint32_t(13)
+#define CPU_TYPE_SPARC   uint32_t(14)
+#define CPU_TYPE_I860    uint32_t(15)
+#define CPU_TYPE_POWERPC uint32_t(18)
+
+#define CPU_TYPE_I386 CPU_TYPE_X86
+
+#define CPU_TYPE_ARM64     (CPU_ARCH_ABI64 | CPU_TYPE_ARM)
+#define CPU_TYPE_POWERPC64 (CPU_ARCH_ABI64 | CPU_TYPE_POWERPC)
+#define CPU_TYPE_X86_64    (CPU_ARCH_ABI64 | CPU_TYPE_X86)
 
 #define LC_REQ_DYLD 0x80000000
 
@@ -162,6 +185,7 @@ struct section_64 { /* for 64-bit architectures */
 	uint32_t	reserved2;	/* reserved (for count or sizeof) */
 };
 
+using base::AssemblyCrawler;
 
 namespace macho {
 
@@ -174,13 +198,58 @@ uintptr_t Binary::ConvertVirtualAddress(uintptr_t addr) {
     return addr - seg->vmaddr;
   }
 }
+//
+// uintptr_t Binary::ConvertToFileAddress(uintptr_t addr) {
+//   if (Is64Bit()) {
+//     struct section_64 *sect = (struct section_64 *)SectionForAddress(addr);
+//     return addr - sect->addr;
+//   } else {
+//     struct section *sect = (struct section *)SectionForAddress(addr);
+//     return addr - sect->addr;
+//   }
+// }
 
 uintptr_t Binary::FindMetadataRegistration() {
-  return 0; // TODO
+  uintptr_t mod_init_func = FindSection("__mod_init_func");
+  uintptr_t mod_init_func_fileoff = ConvertToFileAddress(mod_init_func);
+
+  size_t ptr_size = (Is64Bit()) ? 8 : 4;
+
+  stream_.set_offset(mod_init_func_fileoff + ptr_size);
+  uintptr_t code_off = stream_.Read<uintptr_t>(mod_init_func_fileoff + ptr_size);
+  code_off = ConvertToFileAddress(code_off);
+
+  char *code = stream_.MapPtr((void *)code_off);
+
+  Arch arch = Architecture();
+  AssemblyCrawler *crawler;
+  uintptr_t metadata_reg;
+
+  switch (arch) {
+    case Arch::ARM64: {
+      crawler = new arm64::AssemblyCrawler();
+
+      break;
+    }
+    case Arch::ARM: {
+      crawler = new arm::AssemblyCrawler();
+    }
+  }
+
+  if (!crawler->Crawl(code_off, code, &metadata_reg, nullptr)) {
+    // not found
+  }
+
+  delete crawler;
+  return metadata_reg;
 }
 
 uintptr_t Binary::FindCodeRegistration() {
-  return 0; // TODO
+  uintptr_t mod_init_func = FindSection("_mod_init_func", false);
+  size_t ptr_size = (Is64Bit()) ? 8 : 4;
+  uintptr_t il2cpp_init_func = ConvertVirtualAddress(mod_init_func + ptr_size);
+  // TODO: parse assembly of il2cpp_init_func
+  return 0;
 }
 
 bool Binary::IsValid() {
@@ -197,6 +266,30 @@ bool Binary::Is64Bit() {
   stream_.set_offset(base_);
   uint32_t magic = stream_.PeekUInt();
   return (magic == MH_MAGIC_64 || magic == MH_CIGAM_64);
+}
+
+Arch Binary::Architecture() {
+  stream_.set_offset(base_);
+  if (Is64Bit()) {
+    mach_header_64 *mh = stream_.View<mach_header_64>(base_);
+    switch (mh->cputype) {
+      case CPU_TYPE_ARM64: {
+        return Arch::ARM64;
+      }
+      case CPU_TYPE_ARM: {
+        return Arch::ARM;
+      }
+      case CPU_TYPE_X86: {
+        return Arch::x86;
+      }
+      case CPU_TYPE_X86_64: {
+        return Arch::x64;
+      }
+      default: {
+        // exception
+      }
+    }
+  }
 }
 
 uintptr_t Binary::FindLoadCommand(uint32_t load_command, bool rebase) {
@@ -269,12 +362,12 @@ uintptr_t Binary::FindSection(std::string section, bool rebase) {
       mach_header_64 *mh = stream_.View<mach_header_64>(base_);
       lcmd = (struct load_command *)(mh + 1);
       for (uint32_t i=0; i<mh->ncmds; i++, lcmd += (lcmd->cmdsize / sizeof(struct load_command))) {
-        if (lcmd->cmd == LC_SEGMENT) {
+        if (lcmd->cmd == LC_SEGMENT_64) {
           struct segment_command_64 *seg = (struct segment_command_64 *)(lcmd);
           struct section_64 *sect64 = (struct section_64 *)(seg + 1);
           for (uint32_t i=0; i<seg->nsects; i++, sect64++) {
             if (strcmp(sect64->sectname, sectname) == 0) {
-              return (rebase) ? base_ + (uintptr_t)sect64 : (uintptr_t)sect64;
+              return (rebase) ? base_ + (uintptr_t)sect64->addr : (uintptr_t)sect64->addr;
             }
           }
         }
@@ -284,11 +377,11 @@ uintptr_t Binary::FindSection(std::string section, bool rebase) {
       lcmd = (struct load_command *)(mh + 1);
       for (uint32_t i=0; i<mh->ncmds; i++, lcmd += (lcmd->cmdsize / sizeof(struct load_command))) {
         if (lcmd->cmd == LC_SEGMENT) {
-          struct segment_command_64 *seg = (struct segment_command_64 *)(lcmd);
+          struct segment_command *seg = (struct segment_command *)(lcmd);
           struct section *sect = (struct section *)(seg + 1);
           for (uint32_t i=0; i<seg->nsects; i++, sect++) {
             if (strcmp(sect->sectname, sectname) == 0) {
-              return (rebase) ? base_ + (uintptr_t)sect : (uintptr_t)sect;
+              return (rebase) ? base_ + (uintptr_t)sect->addr : (uintptr_t)sect->addr;
             }
           }
         }
@@ -320,13 +413,48 @@ uintptr_t Binary::SegmentForAddress(uintptr_t address, bool rebase) {
     for (uint32_t i=0; i<mh->ncmds; i++, lcmd += (lcmd->cmdsize / sizeof(struct load_command))) {
       if (lcmd->cmd == LC_SEGMENT) {
         struct segment_command *seg = (struct segment_command *)(lcmd);
-        if (seg->vmaddr <= address && seg->vmaddr + seg->vmsize >= address) {
+        if (seg->vmaddr <= address && seg->vmaddr + seg->vmsize > address) {
           return (rebase) ? base_ + (uintptr_t)seg : (uintptr_t)seg;
         }
       }
     }
   }
   return 0; // throw exception?
+}
+
+uintptr_t Binary::ConvertToFileAddress(uintptr_t address) {
+  stream_.set_offset(base_);
+  struct load_command *lcmd;
+  if (Is64Bit()) {
+    mach_header_64 *mh = stream_.View<mach_header_64>(base_);
+    lcmd = (struct load_command *)(mh + 1);
+    for (uint32_t i=0; i<mh->ncmds; i++, lcmd += (lcmd->cmdsize / sizeof(struct load_command))) {
+      if (lcmd->cmd == LC_SEGMENT_64) {
+        struct segment_command_64 *seg = (struct segment_command_64 *)(lcmd);
+        struct section_64 *sect64 = (struct section_64 *)(seg + 1);
+        for (uint32_t i=0; i<seg->nsects; i++, sect64++) {
+          if (sect64->addr <= address && sect64->addr + sect64->size > address) {
+            return address - sect64->addr + base_ + sect64->offset;
+          }
+        }
+      }
+    }
+  } else {
+    mach_header *mh = stream_.View<mach_header>(base_);
+    lcmd = (struct load_command *)(mh + 1);
+    for (uint32_t i=0; i<mh->ncmds; i++, lcmd += (lcmd->cmdsize / sizeof(struct load_command))) {
+      if (lcmd->cmd == LC_SEGMENT) {
+        struct segment_command *seg = (struct segment_command *)(lcmd);
+        struct section *sect = (struct section *)(seg + 1);
+        for (uint32_t i=0; i<seg->nsects; i++, sect++) {
+          if (sect->addr <= address && sect->addr + sect->size > address) {
+            return address - sect->addr + base_ + sect->offset;
+          }
+        }
+      }
+    }
+  }
+  return 0;
 }
 
 }
