@@ -11,6 +11,7 @@
 #include <gflags/gflags.h>
 
 #include "versions/21/version.h"
+#include "macho_binary.h"
 
 #if _WIN64 || __x86_64__
 DECLARE_uint64(metadata_registration);
@@ -21,6 +22,18 @@ DECLARE_uint32(code_registration);
 #endif
 
 namespace base {
+
+MetadataLoader::MetadataLoader(MemoryStream *metadata, MemoryStream *bin_stream)
+: metadata_(metadata), binary_(nullptr) {
+  BinaryType type = Binary::Type(bin_stream);
+  switch (type) {
+    case BinaryType::MachO: {
+      binary_ = new macho::Binary(*bin_stream, 0x0);
+
+      break;
+    }
+  }
+}
 
 bool MetadataLoader::GenerateIDC(std::string path) {
   uint32_t version = GetMetadataVersion();

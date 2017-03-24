@@ -9,20 +9,21 @@
 #pragma once
 
 #include "memory_stream.h"
+#include "binary.h"
 
 namespace base {
 
 class MetadataLoader {
 public:
-  MetadataLoader(MemoryStream *metadata, MemoryStream *binary)
-    : metadata_(metadata), binary_(binary) {}
+  MetadataLoader(MemoryStream *metadata, MemoryStream *bin_stream);
 
   bool GenerateIDC(std::string outPath);
   bool GenerateHeaders(std::string outPath);
 private:
   bool IsMetadataValid();
   uint32_t GetMetadataVersion();
-  MemoryStream *metadata_, *binary_;
+  MemoryStream *metadata_;
+  Binary *binary_;
 };
 
 }
