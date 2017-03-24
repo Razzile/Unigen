@@ -14,12 +14,16 @@ namespace base {
 
 enum BinaryType {
     MachO,
+    FatMachO,
     ELF,
+    PE,
     UNKNOWN
 };
 
 class Binary {
 public:
+    static BinaryType Type(MemoryStream *stream);
+
     Binary(std::string file) : stream_(file), type_(UNKNOWN) {}
     Binary(MemoryStream &stream) : stream_(stream), type_(UNKNOWN) {}
 

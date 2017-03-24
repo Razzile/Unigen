@@ -9,15 +9,18 @@
 #pragma once
 
 #include "../../memory_stream.h"
+#include "../../binary.h"
 #include "il2cpp.h"
 #include <vector>
 
 namespace versions {
 namespace v21 {
 
+using base::Binary;
+
 class MetadataParser {
 public:
-  MetadataParser(MemoryStream *metadata, MemoryStream *binary, uintptr_t m_reg, uintptr_t c_reg) :
+  MetadataParser(MemoryStream *metadata, Binary *binary, uintptr_t m_reg, uintptr_t c_reg) :
     metadata_(metadata),
     binary_(binary),
     loaded_(false),
@@ -40,7 +43,8 @@ private:
 const char *TypeNameFromType(const Il2CppType *type);
   const char *StringLookup(StringIndex index);
 
-  MemoryStream *metadata_, *binary_;
+  MemoryStream *metadata_;
+  Binary *binary_;
   bool loaded_;
   Il2CppGlobalMetadataHeader header_;
   uintptr_t metadata_registration_; // g_MetadataRegistration location

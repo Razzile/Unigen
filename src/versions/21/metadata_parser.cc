@@ -17,6 +17,7 @@ void MetadataParser::Load() {
   auto &header = header_;
   header = stream->Read<Il2CppGlobalMetadataHeader>(0x0);
   loaded_ = true;
+  binary_->FindMetadataRegistration();
 }
 
 std::vector<Il2CppImage> MetadataParser::Images() {
@@ -156,16 +157,18 @@ const char *MetadataParser::StringLookup(StringIndex nameIndex) {
 }
 
 Il2CppType *MetadataParser::TypeFromTypeIndex(TypeIndex index) {
-  auto *metadata_reg = binary_->View<Il2CppMetadataRegistration>(metadata_registration_);
-  Il2CppType **types = (Il2CppType **)binary_->MapPtr((void *)((uintptr_t)metadata_reg->types - 0x100000000));
-  Il2CppType *type = (Il2CppType *)binary_->MapPtr(types[index]);
+  auto *metadata_reg = binary_->stream().View<Il2CppMetadataRegistration>(metadata_registration_);
+  uintptr_t type_addr = binary_->ConvertVirtualAddress((uintptr_t)metadata_reg->types);
+  Il2CppType **types = (Il2CppType **)binary_->stream().MapPtr((void *)(type_addr));
+  Il2CppType *type = (Il2CppType *)binary_->stream().MapPtr(types[index]);
 
   return type;
 }
 
 Il2CppMethodPointer MetadataParser::MethodPointerFromIndex(MethodIndex index) {
-  auto *code_reg = binary_->View<Il2CppCodeRegistration>(code_registration_);
-  Il2CppMethodPointer *types = (Il2CppMethodPointer *)binary_->MapPtr((void *)((uintptr_t)(code_reg->methodPointers) - 0x100000000));
+  auto *code_reg = binary_->stream().View<Il2CppCodeRegistration>(code_registration_);
+  uintptr_t method_pointer_addr = binary_->ConvertVirtualAddress((uintptr_t)code_reg->methodPointers);
+  Il2CppMethodPointer *types = (Il2CppMethodPointer *)binary_->stream().MapPtr((void *)method_pointer_addr);
 
   Il2CppMethodPointer pointer = (Il2CppMethodPointer)types[index];
   return pointer;
