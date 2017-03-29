@@ -37,7 +37,6 @@ MetadataLoader::MetadataLoader(MemoryStream *metadata, MemoryStream *bin_stream)
 
 bool MetadataLoader::GenerateIDC(std::string path) {
   uint32_t version = GetMetadataVersion();
-  printf("%d\n", version);
   switch (version) {
     case 21:
     case 22: {
