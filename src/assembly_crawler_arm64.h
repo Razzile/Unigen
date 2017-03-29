@@ -7,7 +7,11 @@
  ******************************************************************************
  */
 
+#pragma once
+
 #include "assembly_crawler.h"
+#include <map>
+#include <vector>
 
 namespace arm64 {
 
@@ -17,6 +21,8 @@ public:
   bool Crawl(uintptr_t start, char *code, uintptr_t *meta_out, uintptr_t *code_out) override;
 
 private:
+  void MakeBLPass(Disassembler &dis, std::vector<uintptr_t> &out);
+  void MakeADRPPass(Disassembler &dis, std::map<uint32_t, uintptr_t> &out);
 };
 
 }
