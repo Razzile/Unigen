@@ -10,7 +10,7 @@
 #pragma once
 
 #include <sys/types.h>
-#include <capstone.h>
+#include <capstone/capstone.h>
 #include <functional>
 #include "instr.h"
 
@@ -53,7 +53,8 @@ public:
 
     int SetupDisassembler();
 
-    Instr Disassemble();
+    Instr Disassemble(size_t off = 0);
+    Instr DisassembleNext(Instr &current);
     void DisassembleIter(IterCallback cb);
 
     bool setup() const { return setup_; }
@@ -62,6 +63,7 @@ public:
     void set_address(uintptr_t address) { address_ = address; }
 
     const uint8_t *code() const { return code_; }
+    void set_code(const uint8_t *code) { code_ = code; }
 
     Arch arch() const { return arch_; }
     Mode mode() const { return mode_; }

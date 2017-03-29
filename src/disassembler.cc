@@ -24,11 +24,17 @@ int Disassembler::SetupDisassembler() {
     return res;
 }
 
-Instr Disassembler::Disassemble() {
+Instr Disassembler::Disassemble(size_t off) {
     cs_insn *insn;
-    cs_disasm(handle_, code_, size_, address_, 0, &insn);
+    cs_disasm(handle_, code_ + off, size_, address_ + off, 0, &insn);
 
     return Instr(insn);
+}
+
+Instr Disassembler::DisassembleNext(Instr &current) {
+  size_t offset = current.address() - address_;
+  offset += current.size();
+  return Disassemble(offset);
 }
 
 void Disassembler::DisassembleIter(IterCallback cb) {
