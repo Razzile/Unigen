@@ -24,7 +24,7 @@ public:
   uintptr_t FindCodeRegistration() override;
 
   uintptr_t ConvertVirtualAddress(uintptr_t addr) override;
-  uintptr_t IsText(uintptr_t addr) override;
+  base::SectionType SectionTypeForAddress(uintptr_t addr) override;
 
   uintptr_t base() { return base_; }
   uintptr_t set_base(uintptr_t base) { base_ = base; }
@@ -36,12 +36,19 @@ private:
 
   uintptr_t ConvertToFileAddress(uintptr_t addr);
 
-  uintptr_t FindLoadCommand(uint32_t load_command, bool rebase = true);
-  uintptr_t FindSegment(std::string segment, bool rebase = true);
-  uintptr_t FindSection(std::string section, bool rebase = true);
+  template <typename T>
+  T *FindLoadCommand(uint32_t load_command, bool rebase = true);
+  template <typename T>
+  T *FindSegment(std::string segment, bool rebase = true);
+  template <typename T>
+  T *FindSection(std::string section, bool rebase = true);
 
-  uintptr_t SegmentForAddress(uintptr_t address, bool rebase = true);
-  uintptr_t SectionForAddress(uintptr_t address, bool rebase = true);
+  uintptr_t FindSectionStart(std::string section, bool rebase = true);
+
+  template <typename T>
+  T *SegmentForAddress(uintptr_t address, bool rebase = true);
+  template <typename T>
+  T *SectionForAddress(uintptr_t address, bool rebase = true);
 
   uintptr_t base_;
 };
