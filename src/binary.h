@@ -29,10 +29,11 @@ public:
 
     MemoryStream &stream() { return stream_; }
 
-    virtual uintptr_t ConvertVirtualAddress(uintptr_t addr) = 0;
-
     virtual uintptr_t FindMetadataRegistration() = 0;
     virtual uintptr_t FindCodeRegistration() = 0;
+
+    virtual uintptr_t ConvertVirtualAddress(uintptr_t addr) = 0;
+    virtual bool IsText(uintptr_t addr) = 0;
 protected:
     MemoryStream stream_;
     BinaryType type_;

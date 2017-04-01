@@ -20,10 +20,11 @@ public:
   Binary(std::string path, uintptr_t base) : base::Binary(path), base_(base) {}
   Binary(MemoryStream &stream, uintptr_t base) : base::Binary(stream), base_(base) {}
 
-  uintptr_t ConvertVirtualAddress(uintptr_t addr) override;
-
   uintptr_t FindMetadataRegistration() override;
   uintptr_t FindCodeRegistration() override;
+
+  uintptr_t ConvertVirtualAddress(uintptr_t addr) override;
+  uintptr_t IsText(uintptr_t addr) override;
 
   uintptr_t base() { return base_; }
   uintptr_t set_base(uintptr_t base) { base_ = base; }

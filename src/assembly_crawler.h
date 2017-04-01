@@ -10,15 +10,19 @@
 #pragma once
 
 #include "disassembler.h"
+##include "binary.h"
 
 namespace base {
 
 class AssemblyCrawler {
 public:
-  AssemblyCrawler() = default;
+  AssemblyCrawler(Binary *binary) : binary_(binary) {}
+  
   virtual bool Crawl(uintptr_t start, char *code, uintptr_t *meta_out, uintptr_t *code_out) {
     throw std::runtime_error("something has gone terribly wrong");
   }
+private:
+  Binary *binary_;
 };
 
 }
