@@ -35,11 +35,16 @@ MetadataLoader::MetadataLoader(MemoryStream *metadata, MemoryStream *bin_stream)
   }
 }
 
+MetadataLoader::~MetadataLoader() {
+  delete binary_;
+}
+
 bool MetadataLoader::GenerateIDC(std::string path) {
   uint32_t version = GetMetadataVersion();
   switch (version) {
     case 21:
     case 22: {
+      // the v21 loader also works for v22
       namespace target = versions::v21;
       auto parser = target::MetadataParser(metadata_, binary_,
         FLAGS_metadata_registration, FLAGS_code_registration);

@@ -16,12 +16,14 @@ namespace base {
 class MetadataLoader {
 public:
   MetadataLoader(MemoryStream *metadata, MemoryStream *bin_stream);
+  ~MetadataLoader();
 
   bool GenerateIDC(std::string outPath);
   bool GenerateHeaders(std::string outPath);
 private:
   bool IsMetadataValid();
   uint32_t GetMetadataVersion();
+
   MemoryStream *metadata_;
   Binary *binary_;
 };
