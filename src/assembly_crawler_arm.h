@@ -13,7 +13,7 @@ namespace arm {
 
 class AssemblyCrawler : public base::AssemblyCrawler {
 public:
-  AssemblyCrawler() : base::AssemblyCrawler() {}
+  AssemblyCrawler(base::Binary *binary) : base::AssemblyCrawler(binary) {}
   bool Crawl(uintptr_t start, char *code, uintptr_t *meta_out, uintptr_t *code_out) override;
 
 private:
