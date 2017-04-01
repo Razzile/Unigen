@@ -14,22 +14,6 @@
 #include <functional>
 #include "instr.h"
 
-#if defined(__x86_64__)
-#define HOST_ARCH Arch::x86
-#define HOST_MODE Mode::Mode64
-#elif defined(__i386__)
-#define HOST_ARCH Arch::x86
-#define HOST_MODE Mode::Mode32
-#elif defined(__arm64__)
-#define HOST_ARCH Arch::ARM64
-#define HOST_MODE Mode::Mode64
-#elif defined(__arm__)
-#define HOST_ARCH Arch::ARM
-#define HOST_MODE Mode::ModeTHUMB
-#else
-#error building for an invalid arch
-#endif
-
 using IterCallback = std::function<bool(Instr)>;
 
 enum class Arch {
@@ -48,7 +32,7 @@ enum class Mode {
 
 class Disassembler {
 public:
-    Disassembler(uintptr_t addr, const uint8_t *code, size_t size, Arch arch = HOST_ARCH, Mode mode = HOST_MODE);
+    Disassembler(uintptr_t addr, const uint8_t *code, size_t size, Arch arch, Mode mode);
     ~Disassembler();
 
     int SetupDisassembler();
