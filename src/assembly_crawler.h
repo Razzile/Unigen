@@ -10,7 +10,7 @@
 #pragma once
 
 #include "disassembler.h"
-##include "binary.h"
+#include "binary.h"
 
 namespace base {
 
@@ -21,7 +21,8 @@ public:
   virtual bool Crawl(uintptr_t start, char *code, uintptr_t *meta_out, uintptr_t *code_out) {
     throw std::runtime_error("something has gone terribly wrong");
   }
-private:
+
+protected:
   Binary *binary_;
 };
 
