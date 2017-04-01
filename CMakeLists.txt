@@ -23,3 +23,4 @@ add_executable(Unigen ${unigen_SRC})
 # set_property(TARGET Unigen PROPERTY CXX_STANDARD 17)
 
 target_link_libraries(Unigen gflags capstone-static)
+target_include_directories(Unigen PUBLIC "third_party/capstone/include")
