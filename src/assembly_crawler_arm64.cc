@@ -11,6 +11,8 @@
 
 namespace arm64 {
 
+using base::SectionType;
+
 bool AssemblyCrawler::Crawl(uintptr_t start, char *code,
   uintptr_t *meta_reg_out, uintptr_t *code_reg_out) {
   Disassembler dis(start, (const uint8_t *)code, 32, Arch::ARM64, Mode::ModeARM);
@@ -20,6 +22,7 @@ bool AssemblyCrawler::Crawl(uintptr_t start, char *code,
 
   std::vector<uintptr_t> bl_addresses;
   MakeBLPass(dis, bl_addresses);
+
   for (uintptr_t &addr : bl_addresses) {
     const uint8_t *target_code = (const uint8_t *)(code - start) + addr;
     dis.set_address(addr);
@@ -27,11 +30,21 @@ bool AssemblyCrawler::Crawl(uintptr_t start, char *code,
 
     std::map<uint32_t, uintptr_t> adrp_refs;
     MakeADRPPass(dis, adrp_refs);
-    if (auto pair = adrp_refs.find(ARM64_REG_X1) != adrp_refs.end()) {
+    auto pair = adrp_refs.find(ARM64_REG_X1);
+    if (pair != adrp_refs.end()) {
       // we found an ADRP that is stored in X1
       // check if pair->second is in __TEXT or __DATA
+      SectionType type = binary_->SectionTypeForAddress(pair->second);
+      if (type == SectionType::TEXT) {
+        printf("TEXT: 0x%llx\n", pair->second);
+      } else if (type == SectionType::DATA) {
+        printf("DATA: 0x%llx\n", pair->second);
+      } else {
+        return false;
+      }
     }
   }
+  return false;
 }
 
 void AssemblyCrawler::MakeBLPass(Disassembler &dis, std::vector<uintptr_t> &out) {

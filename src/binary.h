@@ -10,9 +10,8 @@
 #include "memory_stream.h"
 
 namespace base {
-// in future binary will hold a mach-o/elf parser obj
 
-enum BinaryType {
+enum class BinaryType {
     MachO,
     FatMachO,
     ELF,
@@ -20,12 +19,19 @@ enum BinaryType {
     UNKNOWN
 };
 
+enum class SectionType {
+    INVALID,
+    TEXT,
+    DATA,
+    UNKNOWN
+};
+
 class Binary {
 public:
     static BinaryType Type(MemoryStream *stream);
 
-    Binary(std::string file) : stream_(file), type_(UNKNOWN) {}
-    Binary(MemoryStream &stream) : stream_(stream), type_(UNKNOWN) {}
+    Binary(std::string file) : stream_(file), type_(BinaryType::UNKNOWN) {}
+    Binary(MemoryStream &stream) : stream_(stream), type_(BinaryType::UNKNOWN) {}
 
     MemoryStream &stream() { return stream_; }
 
@@ -33,7 +39,7 @@ public:
     virtual uintptr_t FindCodeRegistration() = 0;
 
     virtual uintptr_t ConvertVirtualAddress(uintptr_t addr) = 0;
-    virtual bool IsText(uintptr_t addr) = 0;
+    virtual SectionType SectionTypeForAddress(uintptr_t addr) = 0;
 protected:
     MemoryStream stream_;
     BinaryType type_;

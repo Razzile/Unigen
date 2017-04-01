@@ -24,9 +24,9 @@ bool AssemblyCrawler::Crawl(uintptr_t start, char *code,
   Disassembler ds(real_start, (const uint8_t *)code, 32, Arch::ARM, mode);
   ds.SetupDisassembler();
   ds.DisassembleIter([&](Instr instr) -> bool {
-
+    return false;
   });
-
+  return true;
 }
 
 }

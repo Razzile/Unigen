@@ -64,6 +64,7 @@ uintptr_t Binary::FindMetadataRegistration() {
     // should only be 1 function reference.
     // go to that function and check for PC-rel LDRs into R0/X0 and R1/X1
     // R0/X0 is g_codeRegistration and R1/X1 is g_metadataRegistration
+  return 0;
 }
 
 }
