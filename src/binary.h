@@ -38,7 +38,9 @@ public:
     virtual uintptr_t FindMetadataRegistration() = 0;
     virtual uintptr_t FindCodeRegistration() = 0;
 
-    virtual uintptr_t ConvertVirtualAddress(uintptr_t addr) = 0;
+    virtual uintptr_t PhysToVirt(uintptr_t addr) = 0;
+    virtual uintptr_t VirtToPhys(uintptr_t addr) = 0;
+
     virtual SectionType SectionTypeForAddress(uintptr_t addr) = 0;
 protected:
     MemoryStream stream_;

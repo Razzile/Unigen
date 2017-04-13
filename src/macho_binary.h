@@ -23,7 +23,9 @@ public:
   uintptr_t FindMetadataRegistration() override;
   uintptr_t FindCodeRegistration() override;
 
-  uintptr_t ConvertVirtualAddress(uintptr_t addr) override;
+  uintptr_t PhysToVirt(uintptr_t addr) override;
+  uintptr_t VirtToPhys(uintptr_t addr) override;
+
   base::SectionType SectionTypeForAddress(uintptr_t addr) override;
 
   uintptr_t base() { return base_; }
@@ -46,9 +48,9 @@ private:
   uintptr_t FindSectionStart(std::string section, bool rebase = true);
 
   template <typename T>
-  T *SegmentForAddress(uintptr_t address, bool rebase = true);
+  T *SegmentForAddress(uintptr_t address, bool virt = true);
   template <typename T>
-  T *SectionForAddress(uintptr_t address, bool rebase = true);
+  T *SectionForAddress(uintptr_t address, bool virt = true);
 
   uintptr_t base_;
 };

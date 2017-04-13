@@ -190,19 +190,29 @@ using base::SectionType;
 
 namespace macho {
 
-uintptr_t Binary::ConvertVirtualAddress(uintptr_t addr) {
+uintptr_t Binary::PhysToVirt(uintptr_t addr) {
   if (Is64Bit()) {
-    struct segment_command_64 *seg = SegmentForAddress<struct segment_command_64>(addr);
+    struct segment_command_64 *seg = SegmentForAddress<struct segment_command_64>(addr, false);
+    return addr + seg->vmaddr;
+  } else {
+    struct segment_command *seg = SegmentForAddress<struct segment_command>(addr, false);
+    return addr + seg->vmaddr;
+  }
+}
+
+uintptr_t Binary::VirtToPhys(uintptr_t addr) {
+  if (Is64Bit()) {
+    struct segment_command_64 *seg = SegmentForAddress<struct segment_command_64>(addr, true);
     return addr - seg->vmaddr;
   } else {
-    struct segment_command *seg = SegmentForAddress<struct segment_command>(addr);
+    struct segment_command *seg = SegmentForAddress<struct segment_command>(addr, true);
     return addr - seg->vmaddr;
   }
 }
 
 SectionType Binary::SectionTypeForAddress(uintptr_t addr) {
   if (Is64Bit()) {
-    struct segment_command_64 *seg = SegmentForAddress<struct segment_command_64>(addr);
+    struct segment_command_64 *seg = SegmentForAddress<struct segment_command_64>(addr, false);
     if (seg) {
       if (!strcmp(seg->segname, "__TEXT")) {
         // this isn't 100% accurate as some data also resides in __TEXT
@@ -284,7 +294,7 @@ uintptr_t Binary::FindMetadataRegistration() {
 uintptr_t Binary::FindCodeRegistration() {
   uintptr_t mod_init_func = FindSectionStart("_mod_init_func", false);
   size_t ptr_size = (Is64Bit()) ? 8 : 4;
-  uintptr_t il2cpp_init_func = ConvertVirtualAddress(mod_init_func + ptr_size);
+  uintptr_t il2cpp_init_func = VirtToPhys(mod_init_func + ptr_size);
   // TODO: parse assembly of il2cpp_init_func
   return 0;
 }
@@ -474,7 +484,7 @@ uintptr_t Binary::FindSectionStart(std::string section, bool rebase) {
 }
 
 template <typename T>
-T *Binary::SegmentForAddress(uintptr_t address, bool rebase) {
+T *Binary::SegmentForAddress(uintptr_t address, bool virt) {
   stream_.set_offset(base_);
   struct load_command *lcmd;
   if (Is64Bit()) {
@@ -483,11 +493,12 @@ T *Binary::SegmentForAddress(uintptr_t address, bool rebase) {
     for (uint32_t i=0; i<mh->ncmds; i++, lcmd += (lcmd->cmdsize / sizeof(struct load_command))) {
       if (lcmd->cmd == LC_SEGMENT_64) {
         struct segment_command_64 *seg = (struct segment_command_64 *)(lcmd);
-        if (seg->vmaddr <= address && seg->vmaddr + seg->vmsize >= address) {
-          if (rebase) {
-            uintptr_t addr = base_ + (uintptr_t)seg;
-            return (T *)addr;
-          } else {
+        if (virt) {
+          if (seg->vmaddr <= address && seg->vmaddr + seg->vmsize >= address) {
+            return (T *)seg;
+          }
+        } else {
+          if (seg->fileoff <= address && seg->fileoff + seg->vmsize >= address) {
             return (T *)seg;
           }
         }
@@ -499,11 +510,12 @@ T *Binary::SegmentForAddress(uintptr_t address, bool rebase) {
     for (uint32_t i=0; i<mh->ncmds; i++, lcmd += (lcmd->cmdsize / sizeof(struct load_command))) {
       if (lcmd->cmd == LC_SEGMENT) {
         struct segment_command *seg = (struct segment_command *)(lcmd);
-        if (seg->vmaddr <= address && seg->vmaddr + seg->vmsize > address) {
-          if (rebase) {
-            uintptr_t addr = base_ + (uintptr_t)seg;
-            return (T *)addr;
-          } else {
+        if (virt) {
+          if (seg->vmaddr <= address && seg->vmaddr + seg->vmsize >= address) {
+            return (T *)seg;
+          }
+        } else {
+          if (seg->fileoff <= address && seg->fileoff + seg->vmsize >= address) {
             return (T *)seg;
           }
         }
