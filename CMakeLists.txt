@@ -10,8 +10,6 @@ endif()
 add_subdirectory(third_party/gflags)
 add_subdirectory(third_party/capstone)
 
-include_directories(third_party/capstone/include)
-
 include_directories("${CMAKE_SOURCE_DIR}/src")
 file(GLOB_RECURSE unigen_SRC
    "src/*.cc"
