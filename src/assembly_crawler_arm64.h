@@ -22,7 +22,7 @@ public:
 
 private:
   void MakeBLPass(Disassembler &dis, std::vector<uintptr_t> &out);
-  void MakeADRPPass(Disassembler &dis, std::map<uint32_t, uintptr_t> &out);
+  void MakeADRPass(Disassembler &dis, std::map<uint32_t, uintptr_t> &out);
 };
 
 }
