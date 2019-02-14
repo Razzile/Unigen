@@ -8,7 +8,7 @@
  */
 #pragma once
 
-#include "../../idc_generator.h"
+#include "idc_generator.h"
 #include "metadata_parser.h"
 
 namespace versions {

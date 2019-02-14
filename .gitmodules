@@ -5,3 +5,9 @@
 	path = third_party/capstone
 	url = https://github.com/aquynh/capstone.git
 	branch = next
+[submodule "third_party/LIEF"]
+	path = third_party/LIEF
+	url = https://github.com/lief-project/LIEF.git
+[submodule "third_party/googletest"]
+	path = third_party/googletest
+	url = https://github.com/google/googletest.git

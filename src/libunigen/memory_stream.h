@@ -7,7 +7,7 @@
  ******************************************************************************
  */
 #pragma once
-#include "Stream.h"
+#include "stream.h"
 
 class MemoryStream : public Stream {
 public:

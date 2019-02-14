@@ -9,7 +9,7 @@
 
 #include <gflags/gflags.h>
 #include <iostream>
-#include "metadata_loader.h"
+#include "libunigen/metadata_loader.h"
 
 #ifdef _WIN32
 #define HELP_PATH "Unigen\\src"

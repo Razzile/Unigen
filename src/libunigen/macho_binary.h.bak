@@ -9,7 +9,7 @@
 
 #pragma once
 
-#include "binary.h"
+#include "binary_container.h"
 #include "disassembler.h"
 
 namespace macho {
@@ -53,6 +53,9 @@ private:
   T *SectionForAddress(uintptr_t address, bool virt = true);
 
   uintptr_t base_;
+public:
+    uintptr_t getBase_() const;
+    void setBase_(uintptr_t base_);
 };
 
 }

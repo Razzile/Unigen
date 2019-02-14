@@ -1,31 +1,30 @@
 /**
  ******************************************************************************
  * Unigen :  Unity metadata parser for il2cpp games                           *
- * File   :  metadata_loader.h                                                *
+ * File   :  assembly_crawler.h                                               *
  ******************************************************************************
  * Copyright 2017 Satori. All rights reserved.                                *
  ******************************************************************************
  */
+
 #pragma once
 
-#include "memory_stream.h"
-#include "binary.h"
+#include "disassembler.h"
+#include "binary_container.h"
+
 
 namespace base {
 
-class MetadataLoader {
+class AssemblyCrawler {
 public:
-  MetadataLoader(MemoryStream *metadata, MemoryStream *bin_stream);
-  ~MetadataLoader();
+  AssemblyCrawler(BinaryContainer *container) : container_(container) {}
+  
+  virtual bool Crawl(uintptr_t start, char *code, uintptr_t *meta_out, uintptr_t *code_out) {
+    throw std::runtime_error("something has gone terribly wrong");
+  }
 
-  bool GenerateIDC(std::string outPath);
-  bool GenerateHeaders(std::string outPath);
-private:
-  bool IsMetadataValid();
-  uint32_t GetMetadataVersion();
-
-  MemoryStream *metadata_;
-  Binary *binary_;
+protected:
+    BinaryContainer *container_;
 };
 
 }

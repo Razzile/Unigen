@@ -1,20 +1,14 @@
 /**
  ******************************************************************************
  * Unigen :  Unity metadata parser for il2cpp games                           *
- * File   :  binary.h                                                         *
+ * File   :  assembly_crawler_arm.h                                           *
  ******************************************************************************
  * Copyright 2017 Satori. All rights reserved.                                *
  ******************************************************************************
  */
 
-#include "../../binary.h"
+#include "assembly_crawler.h"
 
-namespace versions {
-namespace v21 {
+namespace arm {
 
-class Binary : base::Binary {
-
-};
-
-}
 }

@@ -7,7 +7,7 @@
  ******************************************************************************
  */
 
-#include "macho_binary.h"
+#include "macho_binary.h.bak"
 #include "assembly_crawler_arm.h"
 #include "assembly_crawler_arm64.h"
 
@@ -559,5 +559,4 @@ uintptr_t Binary::ConvertToFileAddress(uintptr_t address) {
   }
   return address;
 }
-
 }

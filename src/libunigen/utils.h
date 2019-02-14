@@ -3,6 +3,9 @@
 #include <memory>
 #include <stdarg.h>
 #include <stdlib.h>
+#include <string.h>
+
+typedef uint64_t address_t;
 
 static std::string string_format(const std::string fmt_str, ...) {
     int final_n,
