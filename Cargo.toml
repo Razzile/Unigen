@@ -1,0 +1,9 @@
+[package]
+name = "Unigen"
+version = "0.1.0"
+authors = ["Razzile <Razzile@users.noreply.github.com>"]
+edition = "2018"
+
+[dependencies]
+capstone = ">=0.5.0"
+clap = {version = "2.32", features = ["yaml"]}
