@@ -4,6 +4,15 @@ version = "0.1.0"
 authors = ["Razzile <Razzile@users.noreply.github.com>"]
 edition = "2018"
 
+[lib]
+name = "libunigen"
+crate-type = ["staticlib"]
+path = "./src/libunigen/lib.rs"
+
+[[bin]]
+name = "unigen"
+path = "./src/unigen/main.rs"
+
 [dependencies]
 capstone = ">=0.5.0"
 clap = {version = "2.32", features = ["yaml"]}
