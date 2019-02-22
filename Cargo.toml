@@ -3,15 +3,17 @@ name = "unigen"
 version = "0.1.0"
 authors = ["Razzile <Razzile@users.noreply.github.com>"]
 edition = "2018"
+path = "./src/unigen"
 
 [lib]
 name = "libunigen"
-crate-type = ["staticlib"]
-path = "./src/libunigen/lib.rs"
+crate-type = ["staticlib", "rlib"]
+path = "src/libunigen/lib.rs"
 
 [[bin]]
 name = "unigen"
-path = "./src/unigen/main.rs"
+path = "src/unigen/main.rs"
+version = "0.1.0"
 
 [dependencies]
 capstone = ">=0.5.0"
