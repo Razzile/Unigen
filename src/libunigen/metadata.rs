@@ -31,8 +31,12 @@ pub mod metadata {
 
     impl MetadataObject {
         pub fn from_file(path: &str) -> MetadataResult {
-            let mut file =
-                File::open(path).unwrap_or_else(|_| panic!("Could not load metadata at {}", path));
+            let mut file = if let Ok(file) = File::open(path) {
+                file   
+            } else {
+                println!("Could not load metadata at {}", path); 
+                return Err(MetadataError::FileNotFound);
+            };
 
             let mut buf = vec![0u8; 0x4];
             if let Err(_) = file.read_exact(&mut buf) {
@@ -45,7 +49,7 @@ pub mod metadata {
             
             Ok(MetadataObject {
                 file: file,
-                version: "1.0.0".to_string(),
+                version: String::from("1.0.0"),
             })
         }
 
